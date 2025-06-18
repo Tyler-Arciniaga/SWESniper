@@ -27,6 +27,11 @@ func (h *URLHandler) HandleAddURL(c *gin.Context) {
 		return
 	}
 
+	err = h.Service.StoreURL(&req)
+	if err != nil {
+		c.JSON(http.StatusConflict, err.Error())
+	}
+
 	fmt.Print(req.URL, req.Description, req.CheckInterval)
 	c.Status(http.StatusCreated)
 }

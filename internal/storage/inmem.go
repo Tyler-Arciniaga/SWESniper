@@ -23,6 +23,11 @@ func (s *InMemStore) SaveURL(r models.URLRecord) error {
 
 }
 
+func (s *InMemStore) UpdateURLInfo(r models.URLRecord) error {
+	s.Data[r.URL] = r
+	return nil
+}
+
 func (s *InMemStore) GetAll() ([]models.URLRecord, error) {
 	dataAsSlice := slices.Collect(maps.Values(s.Data))
 	if dataAsSlice == nil {

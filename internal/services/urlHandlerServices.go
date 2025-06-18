@@ -13,6 +13,7 @@ type URLService struct {
 
 type URLStore interface {
 	SaveURL(r models.URLRecord) error
+	UpdateURLInfo(r models.URLRecord) error
 	GetAll() ([]models.URLRecord, error)
 }
 
@@ -26,8 +27,16 @@ func (s *URLService) ValidateURLPost(r *models.AddURLRequest) error {
 }
 
 func (s *URLService) StoreURL(r *models.AddURLRequest) error {
-	c := time.Now().Unix()
-	urlRecord := models.URLRecord{URL: r.URL, Description: r.Description, CheckInterval: r.CheckInterval, Created_at: c}
+	c := time.Now()
+	urlRecord := models.URLRecord{
+		URL:           r.URL,
+		Description:   r.Description,
+		CheckInterval: r.CheckInterval,
+		LastCheckedAt: c,
+		LastKnownHash: "",
+		Created_at:    c,
+	}
+
 	e := s.Store.SaveURL(urlRecord)
 	if e != nil {
 		return e

@@ -1,7 +1,10 @@
 package poller
 
 import (
+	"crypto/sha256"
 	"fmt"
+	"io"
+	"net/http"
 	"sync"
 	"time"
 
@@ -43,7 +46,7 @@ func (p *Poller) StartPoller() {
 
 			go func(v models.URLRecord) {
 				defer wg.Done()
-				p.CheckURL(v)
+				p.CheckURL(&v)
 			}(value)
 		}
 
@@ -51,6 +54,63 @@ func (p *Poller) StartPoller() {
 	}
 }
 
-func (p *Poller) CheckURL(r models.URLRecord) {
-	fmt.Println(r)
+/*
+	High level workflow of checkURL():
+
+1. Make an HTTP GET request to the URL
+2. Read the response body
+3. Hash the body (e.g., SHA256)
+4. Compare the hash to the previously stored hash
+5. If different:
+  - Mark as changed (log, notify, update)
+
+6. Always:
+  - Update LastCheckedAt
+  - Store the new hash
+*/
+func (p *Poller) CheckURL(r *models.URLRecord) {
+	if time.Since(r.LastCheckedAt) >= time.Duration(r.CheckInterval) {
+		resp, err := http.Get(r.URL)
+
+		if err != nil {
+			fmt.Printf("Get request to %q failed", r.URL)
+		}
+
+		body, err := io.ReadAll(resp.Body)
+
+		if err != nil {
+			fmt.Println("Failed to read body of Get request response")
+		}
+
+		newHashedBody, e := p.FetchHash(string(body))
+
+		if e != nil {
+			fmt.Print(e)
+		}
+
+		fmt.Println(newHashedBody)
+
+		if newHashedBody != r.LastKnownHash {
+			fmt.Printf("Detected change in URL %q", r.URL)
+		}
+
+		r.LastCheckedAt = time.Now()
+		r.LastKnownHash = newHashedBody
+
+		_ = p.Store.UpdateURLInfo(*r)
+	}
+}
+
+func (p *Poller) FetchHash(body string) (string, error) {
+	hasher := sha256.New()
+
+	_, e := hasher.Write([]byte(body))
+
+	if e != nil {
+		return "", e
+	}
+
+	hashed_body := hasher.Sum(nil)
+
+	return fmt.Sprintf("%x", hashed_body), nil
 }

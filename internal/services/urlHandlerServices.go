@@ -13,6 +13,7 @@ type URLService struct {
 
 type URLStore interface {
 	SaveURL(r models.URLRecord) error
+	GetAll() ([]models.URLRecord, error)
 }
 
 // validates add URL POST request
@@ -32,4 +33,14 @@ func (s *URLService) StoreURL(r *models.AddURLRequest) error {
 		return e
 	}
 	return nil
+}
+
+func (s *URLService) GetAllURLs() ([]models.URLRecord, error) {
+	data, e := s.Store.GetAll()
+
+	if e != nil {
+		return nil, e
+	}
+
+	return data, nil
 }

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
@@ -32,6 +31,15 @@ func (h *URLHandler) HandleAddURL(c *gin.Context) {
 		c.JSON(http.StatusConflict, err.Error())
 	}
 
-	fmt.Print(req.URL, req.Description, req.CheckInterval)
 	c.Status(http.StatusCreated)
+}
+
+func (h *URLHandler) HandleGetURLs(c *gin.Context) {
+	URLData, e := h.Service.GetAllURLs()
+
+	if e != nil {
+		c.JSON(http.StatusNotFound, e.Error())
+	}
+
+	c.JSON(http.StatusOK, URLData)
 }

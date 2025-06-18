@@ -2,6 +2,8 @@ package storage
 
 import (
 	"errors"
+	"maps"
+	"slices"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
 )
@@ -19,4 +21,12 @@ func (s *InMemStore) SaveURL(r models.URLRecord) error {
 	s.Data[r.URL] = r
 	return nil
 
+}
+
+func (s *InMemStore) GetAll() ([]models.URLRecord, error) {
+	dataAsSlice := slices.Collect(maps.Values(s.Data))
+	if dataAsSlice == nil {
+		return nil, errors.New("currently have no URLS in database")
+	}
+	return dataAsSlice, nil
 }

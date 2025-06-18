@@ -19,6 +19,6 @@ func main() {
 	//create and start server with all proper handlers
 	router := gin.Default()
 	router.POST("/urls", urlHandler.HandleAddURL)
-	//router.GET("/urls", urlHandler.HandleGetURLs)
+	router.GET("/urls", urlHandler.HandleGetURLs)
 	router.Run()
 }

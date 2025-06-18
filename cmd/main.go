@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Tyler-Arciniaga/SWESniper/internal/handlers"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
+	"github.com/Tyler-Arciniaga/SWESniper/internal/poller"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/services"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/storage"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,9 @@ func main() {
 	}
 	urlService := services.URLService{Store: urlStore}
 	urlHandler := handlers.URLHandler{Service: urlService}
+
+	poller := poller.Poller{Store: urlStore}
+	go poller.StartPoller() //run poller in background (independent from req, res cycle)
 
 	//create and start server with all proper handlers
 	router := gin.Default()

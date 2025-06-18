@@ -9,17 +9,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HandleAddURL(c *gin.Context) {
+type URLHandler struct {
+	Service services.URLService
+}
+
+func (h *URLHandler) HandleAddURL(c *gin.Context) {
 	var req models.AddURLRequest
-	err := c.BindJSON(&req)
+	err := c.ShouldBindJSON(&req)
 
 	if err != nil {
-		c.Status(http.StatusUnprocessableEntity)
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	if valid := services.ValidateURLPost(&req); !valid {
-		c.Status(http.StatusBadRequest)
+	if e := h.Service.ValidateURLPost(&req); e != nil {
+		c.JSON(http.StatusBadRequest, e.Error())
 		return
 	}
 

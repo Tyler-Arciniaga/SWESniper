@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -13,7 +14,8 @@ import (
 )
 
 type Poller struct {
-	Store services.URLStore //interface
+	URLStore         services.URLStore //interface
+	ChangeRepository services.ChangeLogStore
 }
 
 // current plan: think it's probably best to run poller every minute since that is the lowest
@@ -39,7 +41,7 @@ func (p *Poller) StartPoller() {
 
 		var wg sync.WaitGroup
 
-		url_list, _ := p.Store.GetAll()
+		url_list, _ := p.URLStore.URL_GetAll()
 
 		for _, value := range url_list {
 			wg.Add(1)
@@ -88,16 +90,16 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 			fmt.Print(e)
 		}
 
-		fmt.Println(newHashedBody)
-
 		if newHashedBody != r.LastKnownHash {
-			fmt.Printf("Detected change in URL %q", r.URL)
+			log.Printf("Detected change in URL %q", r.URL)
+			newChangeLog := models.ChangeLog{URL: r.URL, Timestamp: time.Now(), DiffSummary: "changed"}
+			p.ChangeRepository.LogURLChange(newChangeLog)
 		}
 
 		r.LastCheckedAt = time.Now()
 		r.LastKnownHash = newHashedBody
 
-		_ = p.Store.UpdateURLInfo(*r)
+		_ = p.URLStore.UpdateURLInfo(*r)
 	}
 }
 

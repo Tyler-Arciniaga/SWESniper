@@ -12,12 +12,12 @@ import (
 func main() {
 	//dev: instantiate url store, service and handler
 	urlStore := &storage.InMemStore{
-		Data: make(map[string]models.URLRecord),
+		URLTable: make(map[string]models.URLRecord),
 	}
-	urlService := services.URLService{Store: urlStore}
+	urlService := services.URLService{URLStore: urlStore}
 	urlHandler := handlers.URLHandler{Service: urlService}
 
-	poller := poller.Poller{Store: urlStore}
+	poller := poller.Poller{URLStore: urlStore}
 	go poller.StartPoller() //run poller in background (independent from req/res cycle)
 
 	//create and start server with all proper handlers

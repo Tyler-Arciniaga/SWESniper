@@ -11,18 +11,24 @@ import (
 
 func main() {
 	//dev: instantiate url store, service and handler
-	urlStore := &storage.InMemStore{
-		URLTable: make(map[string]models.URLRecord),
+	inMemDB := &storage.InMemStore{
+		URLTable:  make(map[string]models.URLRecord),
+		ChangeLog: make(map[string][]models.ChangeRecord),
 	}
-	urlService := services.URLService{URLStore: urlStore}
+	urlService := services.URLService{URLStore: inMemDB}
 	urlHandler := handlers.URLHandler{Service: urlService}
 
-	poller := poller.Poller{URLStore: urlStore}
+	changeLogService := services.ChangeLogService{ChangeRepository: inMemDB}
+	changeLogHandler := handlers.ChangeLogHandler{Service: changeLogService}
+
+	poller := poller.Poller{UrlService: urlService, ChangeLogService: changeLogService}
+
 	go poller.StartPoller() //run poller in background (independent from req/res cycle)
 
 	//create and start server with all proper handlers
 	router := gin.Default()
 	router.POST("/urls", urlHandler.HandleAddURL)
 	router.GET("/urls", urlHandler.HandleGetURLs)
+	router.GET("/changelog", changeLogHandler.HandleGetAllChanges)
 	router.Run()
 }

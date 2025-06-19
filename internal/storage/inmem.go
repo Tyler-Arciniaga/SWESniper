@@ -9,8 +9,8 @@ import (
 )
 
 type InMemStore struct {
-	URLTable       map[string]models.URLRecord
-	ChangeLogTable map[string][]models.ChangeLog
+	URLTable  map[string]models.URLRecord
+	ChangeLog map[string][]models.ChangeRecord
 }
 
 // URLStore interface methods
@@ -40,9 +40,17 @@ func (s *InMemStore) URL_GetAll() ([]models.URLRecord, error) {
 
 // ChangeLogStore interface methods
 
-func (s *InMemStore) LogURLChange(l models.ChangeLog) error {
-	urlLog := s.ChangeLogTable[l.URL]
+func (s *InMemStore) LogURLChange(l models.ChangeRecord) error {
+	urlLog := s.ChangeLog[l.URL]
 	urlLog = append(urlLog, l)
-	s.ChangeLogTable[l.URL] = urlLog
+	s.ChangeLog[l.URL] = urlLog
 	return nil
+}
+
+func (s *InMemStore) ChangeLog_GetAll() ([][]models.ChangeRecord, error) {
+	dataAsSlice := slices.Collect(maps.Values(s.ChangeLog))
+	if dataAsSlice == nil {
+		return nil, errors.New("no changes in any of your URLS yet")
+	}
+	return dataAsSlice, nil
 }

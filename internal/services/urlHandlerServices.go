@@ -8,18 +8,13 @@ import (
 )
 
 type URLService struct {
-	URLStore         URLStore
-	ChangeRepository ChangeLogStore
+	URLStore URLStore
 }
 
 type URLStore interface {
 	SaveURL(r models.URLRecord) error
 	UpdateURLInfo(r models.URLRecord) error
 	URL_GetAll() ([]models.URLRecord, error)
-}
-
-type ChangeLogStore interface {
-	LogURLChange(l models.ChangeLog) error
 }
 
 // validates add URL POST request
@@ -57,4 +52,12 @@ func (s *URLService) GetAllURLs() ([]models.URLRecord, error) {
 	}
 
 	return data, nil
+}
+
+func (s *URLService) UpdateURL(r *models.URLRecord) error {
+	e := s.URLStore.UpdateURLInfo(*r)
+	if e != nil {
+		return e
+	}
+	return nil
 }

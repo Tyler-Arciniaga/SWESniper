@@ -14,8 +14,8 @@ import (
 )
 
 type Poller struct {
-	URLStore         services.URLStore //interface
-	ChangeRepository services.ChangeLogStore
+	UrlService       services.URLService
+	ChangeLogService services.ChangeLogService
 }
 
 // current plan: think it's probably best to run poller every minute since that is the lowest
@@ -41,7 +41,7 @@ func (p *Poller) StartPoller() {
 
 		var wg sync.WaitGroup
 
-		url_list, _ := p.URLStore.URL_GetAll()
+		url_list, _ := p.UrlService.GetAllURLs()
 
 		for _, value := range url_list {
 			wg.Add(1)
@@ -76,6 +76,7 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 
 		if err != nil {
 			fmt.Printf("Get request to %q failed", r.URL)
+			return
 		}
 
 		body, err := io.ReadAll(resp.Body)
@@ -92,14 +93,14 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 
 		if newHashedBody != r.LastKnownHash {
 			log.Printf("Detected change in URL %q", r.URL)
-			newChangeLog := models.ChangeLog{URL: r.URL, Timestamp: time.Now(), DiffSummary: "changed"}
-			p.ChangeRepository.LogURLChange(newChangeLog)
+			newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), DiffSummary: "changed"}
+			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
 		}
 
 		r.LastCheckedAt = time.Now()
 		r.LastKnownHash = newHashedBody
 
-		_ = p.URLStore.UpdateURLInfo(*r)
+		_ = p.UrlService.UpdateURL(r)
 	}
 }
 

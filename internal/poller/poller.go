@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,6 +16,7 @@ type Poller struct {
 	UrlService       services.URLService
 	ChangeLogService services.ChangeLogService
 	ScraperService   services.ScraperService
+	DiffCheckService services.DiffService
 }
 
 // current plan: think it's probably best to run poller every minute since that is the lowest
@@ -81,7 +83,7 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 			log.Printf("No content was extracted for %q", r.URL)
 		}
 
-		//DELETE ME!
+		//DELETE ME! (used to generate testData from real URLs)
 		//os.WriteFile("../testdata/repo2.txt", []byte(scrappedContent), 0644)
 
 		newHashedBody, e := p.FetchHash(string(scrappedContent))
@@ -92,9 +94,11 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 		}
 
 		if newHashedBody != r.LastKnownHash {
-			log.Printf("Detected change in URL %q\n", r.URL)
-			newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), DiffSummary: "changed"}
+			//log.Printf("Detected change in URL %q\n", r.URL)
+			diffRes := p.DiffCheckService.DiffCheckContents(strings.Join(r.LastKnownContent, ""), scrappedContent)
+			newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), DiffSummary: diffRes.Summary}
 			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
+			r.LastKnownContent = diffRes.Added
 		}
 
 		r.LastCheckedAt = time.Now()

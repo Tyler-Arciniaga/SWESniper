@@ -9,10 +9,11 @@ type AddURLRequest struct {
 }
 
 type URLRecord struct {
-	URL           string    `json:"url"`
-	Description   string    `json:"description"`
-	CheckInterval int       `json:"checkInterval"`
-	LastCheckedAt time.Time `json:"lastCheckAt"`
-	LastKnownHash string    `json:"lastKnownHash"`
-	Created_at    time.Time `json:"created_at"`
+	URL              string    `json:"url"`
+	Description      string    `json:"description"`
+	CheckInterval    int       `json:"checkInterval"`
+	LastCheckedAt    time.Time `json:"lastCheckAt"`
+	LastKnownHash    string    `json:"lastKnownHash"`
+	LastKnownContent []string  `json:"lastKnownContent"`
+	Created_at       time.Time `json:"created_at"`
 }

@@ -3,9 +3,7 @@ package poller
 import (
 	"crypto/sha256"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"sync"
 	"time"
 
@@ -16,6 +14,7 @@ import (
 type Poller struct {
 	UrlService       services.URLService
 	ChangeLogService services.ChangeLogService
+	ScraperService   services.ScraperService
 }
 
 // current plan: think it's probably best to run poller every minute since that is the lowest
@@ -72,27 +71,41 @@ func (p *Poller) StartPoller() {
 */
 func (p *Poller) CheckURL(r *models.URLRecord) {
 	if time.Since(r.LastCheckedAt) >= time.Duration(r.CheckInterval) {
-		resp, err := http.Get(r.URL)
-
-		if err != nil {
-			fmt.Printf("Get request to %q failed", r.URL)
+		scrappedContent, e := p.ScraperService.ExtractURLContent(r.URL)
+		if e != nil {
+			log.Printf("Failed to extract main content from url %q, recieved err %q\n", r.URL, e)
 			return
 		}
 
-		body, err := io.ReadAll(resp.Body)
-
-		if err != nil {
-			fmt.Println("Failed to read body of Get request response")
+		if scrappedContent == "" {
+			log.Printf("No content was extracted for %q", r.URL)
 		}
+		/*
+			resp, err := http.Get(r.URL)
 
-		newHashedBody, e := p.FetchHash(string(body))
+			if err != nil {
+				fmt.Printf("Get request to %q failed", r.URL)
+				return
+			}
+
+			defer resp.Body.Close()
+
+			body, err := io.ReadAll(resp.Body)
+
+			if err != nil {
+				fmt.Println("Failed to read body of Get request response")
+			}
+		*/
+
+		newHashedBody, e := p.FetchHash(string(scrappedContent))
 
 		if e != nil {
-			fmt.Print(e)
+			log.Printf("Error creating hash value for new extracted url content: %v\n", e)
+			return
 		}
 
 		if newHashedBody != r.LastKnownHash {
-			log.Printf("Detected change in URL %q", r.URL)
+			log.Printf("Detected change in URL %q\n", r.URL)
 			newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), DiffSummary: "changed"}
 			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
 		}

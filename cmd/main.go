@@ -21,7 +21,9 @@ func main() {
 	changeLogService := services.ChangeLogService{ChangeRepository: inMemDB}
 	changeLogHandler := handlers.ChangeLogHandler{Service: changeLogService}
 
-	poller := poller.Poller{UrlService: urlService, ChangeLogService: changeLogService}
+	scraperService := services.ScraperService{}
+
+	poller := poller.Poller{UrlService: urlService, ChangeLogService: changeLogService, ScraperService: scraperService}
 
 	go poller.StartPoller() //run poller in background (independent from req/res cycle)
 

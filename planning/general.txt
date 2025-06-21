@@ -1,0 +1,2 @@
+Probably will need a small configuration settings for user to input general format of the url:
+i.e. for Github, does it have a table, etc (could maybe even have them select the CSS element themselves)

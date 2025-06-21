@@ -1,0 +1,22 @@
+Target Elements for each type of job board site:
+Github (Simplify, PittCSC, etc):
+class -> .markdown-body
+selector examples:
+1) #repo-content-pjax-container > div > div > div > div.Layout-main > react-partial > div > div > div.OverviewContent-module__Box_11--Tqhu2 > div.OverviewRepoFiles-module__Box_1--xSt0T > div > div.Box-sc-g0xbh4-0.js-snippet-clipboard-copy-unpositioned.DirectoryRichtextContent-module__SharedMarkdownContent--YORdJ > article
+
+func (s *ScraperService) ExtractMainContent(url string) (string, error) {
+    resp, err := http.Get(url)
+    // check err...
+
+    doc, err := goquery.NewDocumentFromReader(resp.Body)
+    // check err...
+
+    // Extract just the content area
+    mainText := ""
+    doc.Find("div.main").Each(func(i int, s *goquery.Selection) {
+        mainText += s.Text()
+    })
+
+    return mainText, nil
+}
+

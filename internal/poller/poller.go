@@ -80,22 +80,9 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 		if scrappedContent == "" {
 			log.Printf("No content was extracted for %q", r.URL)
 		}
-		/*
-			resp, err := http.Get(r.URL)
 
-			if err != nil {
-				fmt.Printf("Get request to %q failed", r.URL)
-				return
-			}
-
-			defer resp.Body.Close()
-
-			body, err := io.ReadAll(resp.Body)
-
-			if err != nil {
-				fmt.Println("Failed to read body of Get request response")
-			}
-		*/
+		//DELETE ME!
+		//os.WriteFile("../testdata/repo2.txt", []byte(scrappedContent), 0644)
 
 		newHashedBody, e := p.FetchHash(string(scrappedContent))
 

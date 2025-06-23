@@ -55,7 +55,7 @@ func (pg *Postgres) SaveURL(r models.URLRecord) error {
 }
 
 func (pg *Postgres) UpdateURLInfo(r models.URLRecord) error {
-	query := `UPDATE urls SET last_checked_at = $1, last_known_hash, $2, last_known_content = $3 WHERE url = $4`
+	query := `UPDATE urls SET last_checked_at = $1, last_known_hash =  $2, last_known_content = $3 WHERE url = $4`
 
 	_, err := pg.Pool.Exec(context.Background(), query,
 		r.LastCheckedAt,
@@ -90,6 +90,7 @@ func (pg *Postgres) URL_GetAll() ([]models.URLRecord, error) {
 }
 
 func (pg *Postgres) LogURLChange(l models.ChangeRecord) error {
+	//query := `SELECT `
 	return nil
 }
 

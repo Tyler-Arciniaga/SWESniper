@@ -1,2 +1,2 @@
 DELETE FROM urls
-WHERE id = 1;
+WHERE id = 2;

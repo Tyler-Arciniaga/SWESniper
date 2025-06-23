@@ -72,6 +72,7 @@ func (p *Poller) StartPoller() {
   - Store the new hash
 */
 func (p *Poller) CheckURL(r *models.URLRecord) {
+	//DONT FORGET TO CHANGE TO time.duration(r.CheckInterval).seconds()
 	if time.Since(r.LastCheckedAt) >= time.Duration(r.CheckInterval) {
 		scrappedContent, e := p.ScraperService.ExtractURLContent(r.URL)
 		if e != nil {
@@ -104,7 +105,10 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 		r.LastCheckedAt = time.Now()
 		r.LastKnownHash = newHashedBody
 
-		_ = p.UrlService.UpdateURL(r)
+		e = p.UrlService.UpdateURL(r)
+		if e != nil {
+			fmt.Println(e)
+		}
 	}
 }
 

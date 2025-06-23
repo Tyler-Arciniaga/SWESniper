@@ -1,24 +1,41 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"os"
+
 	"github.com/Tyler-Arciniaga/SWESniper/internal/handlers"
-	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/poller"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/services"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/storage"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
-	//dev: instantiate url store, service and handler
-	inMemDB := &storage.InMemStore{
-		URLTable:  make(map[string]models.URLRecord),
-		ChangeLog: make(map[string][]models.ChangeRecord),
+	//create connection pool to postgres
+	connstr := "postgresql://localhost/swesniper" //hardcoded databaseURL change later!!!
+	dbpool, err := pgxpool.New(context.Background(), connstr)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
+		os.Exit(1)
 	}
-	urlService := services.URLService{URLStore: inMemDB}
+	defer dbpool.Close()
+
+	/*
+		//dev: instantiate url store, service and handler
+		inMemDB := &storage.InMemStore{
+			URLTable:  make(map[string]models.URLRecord),
+			ChangeLog: make(map[string][]models.ChangeRecord),
+		}
+	*/
+
+	db := &storage.Postgres{Pool: dbpool}
+	urlService := services.URLService{URLStore: db}
 	urlHandler := handlers.URLHandler{Service: urlService}
 
-	changeLogService := services.ChangeLogService{ChangeRepository: inMemDB}
+	changeLogService := services.ChangeLogService{ChangeRepository: db}
 	changeLogHandler := handlers.ChangeLogHandler{Service: changeLogService}
 
 	scraperService := services.ScraperService{}

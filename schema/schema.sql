@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS urls (
     check_interval INT NOT NULL,
     last_checked_at TIMESTAMPTZ,
     last_known_hash TEXT,
-    last_known_content TEXT,
+    last_known_content TEXT [],
     created_at TIMESTAMPTZ
 );
 --@block

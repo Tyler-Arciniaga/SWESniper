@@ -43,7 +43,7 @@ func (pg *Postgres) SaveURL(r models.URLRecord) error {
 		r.CheckInterval,
 		time.Now(), // last_checked_at
 		"",         // last_known_hash
-		"",         // last_known_content
+		[]string{}, // last_known_content
 		time.Now(), // created_at
 	)
 
@@ -81,7 +81,7 @@ func (pg *Postgres) URL_GetAll() ([]models.URLRecord, error) {
 	var records []models.URLRecord
 	for rows.Next() {
 		var r models.URLRecord
-		if err := rows.Scan(&r.URL, &r.Description, &r.CheckInterval, &r.LastCheckedAt, &r.LastKnownHash, &r.LastKnownContent, &r.Created_at); err != nil {
+		if err := rows.Scan(&r.ID, &r.URL, &r.Description, &r.CheckInterval, &r.LastCheckedAt, &r.LastKnownHash, &r.LastKnownContent, &r.Created_at); err != nil {
 			return []models.URLRecord{}, fmt.Errorf("error scanning row: %v", err)
 		}
 		records = append(records, r)

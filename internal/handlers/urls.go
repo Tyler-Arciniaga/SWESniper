@@ -29,6 +29,7 @@ func (h *URLHandler) HandleAddURL(c *gin.Context) {
 	err = h.Service.StoreURL(&req)
 	if err != nil {
 		c.JSON(http.StatusConflict, err.Error())
+		return
 	}
 
 	c.Status(http.StatusCreated)
@@ -39,6 +40,7 @@ func (h *URLHandler) HandleGetURLs(c *gin.Context) {
 
 	if e != nil {
 		c.JSON(http.StatusNotFound, e.Error())
+		return
 	}
 
 	c.JSON(http.StatusOK, URLData)

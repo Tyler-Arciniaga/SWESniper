@@ -107,7 +107,7 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 
 		e = p.UrlService.UpdateURL(r)
 		if e != nil {
-			fmt.Println(e)
+			log.Fatalf("Error: %v", e)
 		}
 	}
 }

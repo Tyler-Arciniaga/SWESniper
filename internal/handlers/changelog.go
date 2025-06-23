@@ -16,6 +16,7 @@ func (h *ChangeLogHandler) HandleGetAllChanges(c *gin.Context) {
 
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, e.Error())
+		return
 	}
 
 	c.JSON(http.StatusOK, changeData)

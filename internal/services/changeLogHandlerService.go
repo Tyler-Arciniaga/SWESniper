@@ -8,7 +8,7 @@ type ChangeLogService struct {
 
 type ChangeLogStore interface {
 	LogURLChange(l models.ChangeRecord) error
-	ChangeLog_GetAll() ([][]models.ChangeRecord, error)
+	ChangeLog_GetAll() ([]models.ChangeRecord, error)
 }
 
 func (s *ChangeLogService) PersistChangeRecord(r *models.ChangeRecord) error {
@@ -19,7 +19,7 @@ func (s *ChangeLogService) PersistChangeRecord(r *models.ChangeRecord) error {
 	return nil
 }
 
-func (s *ChangeLogService) GetAllChangeRecords() ([][]models.ChangeRecord, error) {
+func (s *ChangeLogService) GetAllChangeRecords() ([]models.ChangeRecord, error) {
 	data, e := s.ChangeRepository.ChangeLog_GetAll()
 	if e != nil {
 		return nil, e

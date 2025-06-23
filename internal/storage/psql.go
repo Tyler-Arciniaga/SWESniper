@@ -90,10 +90,47 @@ func (pg *Postgres) URL_GetAll() ([]models.URLRecord, error) {
 }
 
 func (pg *Postgres) LogURLChange(l models.ChangeRecord) error {
-	//query := `SELECT `
+	//find id of desired url
+	var urlID int
+	query := `SELECT id from urls WHERE url = $1`
+	err := pg.Pool.QueryRow(context.Background(), query, l.URL).Scan(&urlID)
+	if err != nil {
+		return fmt.Errorf("error querying for url id in url table: %v", err)
+	}
+
+	//create new log record in change logs table
+	query = `INSERT INTO changelogs (url_id, url, timestamp, diff_summary) VALUES ($1, $2, $3, $4)`
+	_, err = pg.Pool.Exec(context.Background(), query,
+		urlID,
+		l.URL,
+		time.Now(),
+		l.DiffSummary,
+	)
+
+	if err != nil {
+		return fmt.Errorf("error inserting new change record into change logs table: %v", err)
+	}
+
 	return nil
 }
 
-func (p *Postgres) ChangeLog_GetAll() ([][]models.ChangeRecord, error) {
-	return [][]models.ChangeRecord{}, nil
+func (pg *Postgres) ChangeLog_GetAll() ([]models.ChangeRecord, error) {
+	query := `SELECT * FROM changelogs`
+	rows, err := pg.Pool.Query(context.Background(), query)
+
+	if err != nil {
+		return []models.ChangeRecord{}, errors.New("error fetching all records from change logs table")
+	}
+
+	defer rows.Close()
+
+	var logs []models.ChangeRecord
+	for rows.Next() {
+		var r models.ChangeRecord
+		if err := rows.Scan(&r.ID, &r.URL_id, &r.URL, &r.Timestamp, &r.DiffSummary); err != nil {
+			return []models.ChangeRecord{}, fmt.Errorf("error scanning row: %v", err)
+		}
+		logs = append(logs, r)
+	}
+	return logs, nil
 }

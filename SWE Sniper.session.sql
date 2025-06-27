@@ -1,2 +1,1 @@
-DELETE FROM urls
-WHERE id = 2;
+DROP TABLE changelogs

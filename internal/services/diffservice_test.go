@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -12,9 +11,9 @@ func TestDiffService(t *testing.T) {
 		repo1_byte, _ := os.ReadFile("../../testdata/repo1_short.txt")
 		repo2_byte, _ := os.ReadFile("../../testdata/repo1_changed.txt")
 
-		r := diffService.DiffCheckContents(string(repo1_byte), string(repo2_byte))
+		diffService.DiffCheckContents(string(repo1_byte), string(repo2_byte))
 
-		fmt.Println(r.Added)
-		fmt.Println(r.Summary)
+		//fmt.Println(r.Added)
+		//fmt.Println(r.Summary)
 	})
 }

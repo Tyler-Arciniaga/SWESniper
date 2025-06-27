@@ -9,6 +9,7 @@ import (
 
 type ScraperService struct{}
 
+// Todo: make this a smart scraper to have different parsing logic depending on domain of url (i.e. github vs linkedin vs glassdoor, etc)
 func (s *ScraperService) ExtractURLContent(url string) (string, error) {
 	resp, err := http.Get(url)
 
@@ -27,8 +28,7 @@ func (s *ScraperService) ExtractURLContent(url string) (string, error) {
 		return "", fmt.Errorf("failed to parse url content")
 	}
 
-	//IMPORTANT: need to ensure that all github README job boards have table element otherwise will fail and should instead just
-	// return github_readme.Text() (which will be the entire README markdown content)
+	//NOTE: as of now for the MVP the scraper only works with Github public repositories.
 	github_readme := doc.Find("article.markdown-body")
 
 	if github_readme.Length() < 1 {

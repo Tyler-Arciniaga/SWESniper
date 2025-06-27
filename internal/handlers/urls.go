@@ -45,3 +45,20 @@ func (h *URLHandler) HandleGetURLs(c *gin.Context) {
 
 	c.JSON(http.StatusOK, URLData)
 }
+
+func (h *URLHandler) HandleDeleteURL(c *gin.Context) {
+	urlID := c.Param("id")
+	if urlID == "" {
+		c.JSON(http.StatusBadRequest, "no urlID extracted from URL param")
+		return
+	}
+
+	e := h.Service.DeleteURL(urlID)
+
+	if e != nil {
+		c.JSON(http.StatusConflict, e.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, urlID)
+}

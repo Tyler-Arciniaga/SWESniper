@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
@@ -15,6 +16,7 @@ type URLStore interface {
 	SaveURL(r models.URLRecord) error
 	UpdateURLInfo(r models.URLRecord) error
 	URL_GetAll() ([]models.URLRecord, error)
+	URL_Delete(urlID int) error
 }
 
 // validates add URL POST request
@@ -59,5 +61,20 @@ func (s *URLService) UpdateURL(r *models.URLRecord) error {
 	if e != nil {
 		return e
 	}
+	return nil
+}
+
+func (s *URLService) DeleteURL(urlID string) error {
+	int_id, err := strconv.Atoi(urlID)
+
+	if err != nil {
+		return fmt.Errorf("invalid url id parameter")
+	}
+	e := s.URLStore.URL_Delete(int_id)
+
+	if e != nil {
+		return e
+	}
+
 	return nil
 }

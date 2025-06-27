@@ -48,6 +48,7 @@ func main() {
 	router := gin.Default()
 	router.POST("/urls", urlHandler.HandleAddURL)
 	router.GET("/urls", urlHandler.HandleGetURLs)
+	router.DELETE("/urls/:id", urlHandler.HandleDeleteURL)
 	router.GET("/changelog", changeLogHandler.HandleGetAllChanges)
 	router.Run()
 }

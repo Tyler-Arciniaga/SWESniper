@@ -89,6 +89,21 @@ func (pg *Postgres) URL_GetAll() ([]models.URLRecord, error) {
 	return records, nil
 }
 
+func (pg *Postgres) URL_Delete(urlID int) error {
+	query := `DELETE FROM urls WHERE id = $1`
+	res, err := pg.Pool.Exec(context.Background(), query, urlID)
+
+	if err != nil {
+		return fmt.Errorf("error deleting url from urls table: %v", err)
+	}
+
+	if res.RowsAffected() == 0 {
+		return fmt.Errorf("id could not be deleted because it couldn't be find in table: %d", urlID)
+	}
+
+	return nil
+}
+
 func (pg *Postgres) LogURLChange(l models.ChangeRecord) error {
 	//find id of desired url
 	var urlID int

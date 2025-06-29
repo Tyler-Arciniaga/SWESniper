@@ -89,6 +89,29 @@ func (pg *Postgres) URL_GetAll() ([]models.URLRecord, error) {
 	return records, nil
 }
 
+func (pg *Postgres) URL_GetOne(urlID int) (models.URLRecord, error) {
+	query1 := `SELECT EXISTS (SELECT 1 FROM urls WHERE id = $1)`
+	query2 := `SELECT * from urls WHERE id = $1`
+
+	var exists bool
+	err := pg.Pool.QueryRow(context.Background(), query1, urlID).Scan(&exists)
+
+	if err != nil || !exists {
+		return models.URLRecord{}, fmt.Errorf("error checking for existence of queried url or url does not exist in database: %v", err)
+	}
+
+	var r models.URLRecord
+	row := pg.Pool.QueryRow(context.Background(), query2, urlID)
+	err = row.Scan(&r.ID, &r.URL, &r.Description, &r.CheckInterval, &r.LastCheckedAt, &r.LastKnownHash, &r.LastKnownContent, &r.Created_at)
+
+	if err != nil {
+		return models.URLRecord{}, fmt.Errorf("error scanning row: %v", err)
+	}
+
+	return r, nil
+
+}
+
 func (pg *Postgres) URL_Delete(urlID int) error {
 	query := `DELETE FROM urls WHERE id = $1`
 	res, err := pg.Pool.Exec(context.Background(), query, urlID)

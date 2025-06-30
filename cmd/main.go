@@ -41,7 +41,7 @@ func main() {
 
 	scraperService := services.ScraperService{}
 
-	notifier := &notifier.BasicNotifier{}
+	notifier := &notifier.EmailNotifier{}
 
 	poller := poller.Poller{UrlService: urlService, ChangeLogService: changeLogService, ScraperService: scraperService, Notifier: notifier}
 

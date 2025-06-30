@@ -1,5 +1,5 @@
 package models
 
 type JobListing struct {
-	Fields []string
+	Fields []string `json:"fields"`
 }

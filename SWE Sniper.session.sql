@@ -1,1 +1,1 @@
-DROP TABLE changelogs
+DROP TABLE urls

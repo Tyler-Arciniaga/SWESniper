@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"log"
-	"strings"
 	"sync"
 	"time"
 
@@ -74,36 +73,41 @@ func (p *Poller) StartPoller() {
 func (p *Poller) CheckURL(r *models.URLRecord) {
 	//DONT FORGET TO CHANGE TO time.duration(r.CheckInterval).seconds()
 	if time.Since(r.LastCheckedAt) >= time.Duration(r.CheckInterval) {
-		scrappedContent, e := p.ScraperService.ExtractURLContent(r.URL)
+		scrappedContent_RawString, scrappedContent_Formatted, e := p.ScraperService.ExtractURLContent(r.URL)
+
+		if scrappedContent_RawString == "" && scrappedContent_Formatted == nil {
+			log.Printf("No content was extracted for %q", r.URL)
+		}
+
 		if e != nil {
 			log.Printf("Failed to extract main content from url %q, recieved err %q\n", r.URL, e)
 			return
 		}
 
-		if scrappedContent == "" {
-			log.Printf("No content was extracted for %q", r.URL)
-		}
-
 		//DELETE ME! (used to generate testData from real URLs)
 		//os.WriteFile("../testdata/repo2.txt", []byte(scrappedContent), 0644)
 
-		newHashedBody, e := p.FetchHash(string(scrappedContent))
+		newHash, e := p.FetchHash(string(scrappedContent_RawString))
 
 		if e != nil {
 			log.Printf("Error creating hash value for new extracted url content: %v\n", e)
 			return
 		}
 
-		if newHashedBody != r.LastKnownHash {
+		if newHash != r.LastKnownHash {
 			log.Printf("Detected change in URL %q\n", r.URL)
-			diffRes := p.DiffCheckService.DiffCheckContents(strings.Join(r.LastKnownContent, ""), scrappedContent)
-			newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), DiffSummary: diffRes.Summary}
-			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
-			r.LastKnownContent = diffRes.Added
-		}
+			//diffRes := p.DiffCheckService.DiffCheckContents(strings.Join(r.LastKnownContent, ""), scrappedContent_RawString)
+			//newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), DiffSummary: diffRes.Summary}
+			//p.ChangeLogService.PersistChangeRecord(&newChangeLog)
+			if scrappedContent_Formatted != nil {
+				r.LastKnownContent = scrappedContent_Formatted
+			} else {
+				r.LastKnownContent = nil
+			}
 
+		}
 		r.LastCheckedAt = time.Now()
-		r.LastKnownHash = newHashedBody
+		r.LastKnownHash = newHash
 
 		e = p.UrlService.UpdateURL(r)
 		if e != nil {

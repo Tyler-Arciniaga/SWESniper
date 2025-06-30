@@ -137,11 +137,12 @@ func (pg *Postgres) LogURLChange(l models.ChangeRecord) error {
 	}
 
 	//create new log record in change logs table
-	query = `INSERT INTO changelogs (url_id, url, timestamp, diff_summary) VALUES ($1, $2, $3, $4)`
+	query = `INSERT INTO changelogs (url_id, url, timestamp, added, diff_summary) VALUES ($1, $2, $3, $4, $5)`
 	_, err = pg.Pool.Exec(context.Background(), query,
 		urlID,
 		l.URL,
 		time.Now(),
+		l.Added,
 		l.DiffSummary,
 	)
 
@@ -165,7 +166,7 @@ func (pg *Postgres) ChangeLog_GetAll() ([]models.ChangeRecord, error) {
 	var logs []models.ChangeRecord
 	for rows.Next() {
 		var r models.ChangeRecord
-		if err := rows.Scan(&r.ID, &r.URL_id, &r.URL, &r.Timestamp, &r.DiffSummary); err != nil {
+		if err := rows.Scan(&r.ID, &r.URL_id, &r.URL, &r.Timestamp, &r.Added, &r.DiffSummary); err != nil {
 			return []models.ChangeRecord{}, fmt.Errorf("error scanning row: %v", err)
 		}
 		logs = append(logs, r)
@@ -186,7 +187,7 @@ func (pg *Postgres) ChangeLog_GetOneUrl(urlID int) ([]models.ChangeRecord, error
 	var records []models.ChangeRecord
 	for rows.Next() {
 		var r models.ChangeRecord
-		if err := rows.Scan(&r.ID, &r.URL_id, &r.URL, &r.Timestamp, &r.DiffSummary); err != nil {
+		if err := rows.Scan(&r.ID, &r.URL_id, &r.URL, &r.Timestamp, &r.Added, &r.DiffSummary); err != nil {
 			return []models.ChangeRecord{}, fmt.Errorf("error scanning row: %v", err)
 		}
 		records = append(records, r)

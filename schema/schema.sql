@@ -15,5 +15,6 @@ CREATE TABLE IF NOT EXISTS changeLogs (
     url_id INT REFERENCES urls (id) ON DELETE CASCADE,
     url TEXT NOT NULL,
     timestamp TIMESTAMPTZ,
+    added JSONB,
     diff_summary TEXT
 );

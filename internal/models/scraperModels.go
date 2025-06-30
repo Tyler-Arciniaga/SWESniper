@@ -27,3 +27,7 @@ func (j *JobListing) String() string {
 
 	return formatted
 }
+
+func (j *JobListing) String_NameOnly() string {
+	return j.Fields[0]
+}

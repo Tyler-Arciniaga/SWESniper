@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/handlers"
+	"github.com/Tyler-Arciniaga/SWESniper/internal/notifier"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/poller"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/services"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/storage"
@@ -40,7 +41,9 @@ func main() {
 
 	scraperService := services.ScraperService{}
 
-	poller := poller.Poller{UrlService: urlService, ChangeLogService: changeLogService, ScraperService: scraperService}
+	notifier := &notifier.BasicNotifier{}
+
+	poller := poller.Poller{UrlService: urlService, ChangeLogService: changeLogService, ScraperService: scraperService, Notifier: notifier}
 
 	go poller.StartPoller() //run poller in background (independent from req/res cycle)
 

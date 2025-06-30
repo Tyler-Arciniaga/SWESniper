@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
+	"github.com/Tyler-Arciniaga/SWESniper/internal/notifier"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/services"
 )
 
@@ -16,6 +17,7 @@ type Poller struct {
 	ChangeLogService services.ChangeLogService
 	ScraperService   services.ScraperService
 	DiffCheckService services.DiffService
+	Notifier         notifier.Notifier
 }
 
 // current plan: think it's probably best to run poller every minute since that is the lowest
@@ -98,7 +100,14 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 			log.Printf("Detected change in URL %q\n", r.URL)
 			diffRes := p.DiffCheckService.DiffCheckContentsFormatted(r.LastKnownContent, scrappedContent_Formatted)
 			newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), Added: diffRes.Added, DiffSummary: diffRes.Summary}
+
 			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
+
+			tmp := r.Description
+			e = p.Notifier.SendNotification(newChangeLog, tmp)
+			if e != nil {
+				log.Printf("error sending notification for: %q\n", r.URL)
+			}
 
 			if scrappedContent_Formatted != nil {
 				r.LastKnownContent = scrappedContent_Formatted

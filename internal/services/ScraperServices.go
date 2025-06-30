@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
 )
 
 type ScraperService struct{}
@@ -43,13 +44,20 @@ func (s *ScraperService) ExtractURLContent(url string) (string, error) {
 		accessiblity_table = github_readme.Find("strong markdown-accessiblity-table")
 	}
 
-	table := accessiblity_table.Find("table")
+	table := accessiblity_table.Find("table tbody")
 
 	if table.Length() == 0 {
 		log.Printf("no table detected under: %v", accessiblity_table)
-	}
-
-	if table.Length() >= 1 {
+	} else {
+		var job_listings []models.JobListing
+		table.Find("tr").Each(func(i int, s *goquery.Selection) {
+			listing := models.JobListing{}
+			s.Find("td").Each(func(i int, s *goquery.Selection) {
+				listing.Fields = append(listing.Fields, s.Text())
+			})
+			job_listings = append(job_listings, listing)
+		})
+		log.Print(job_listings)
 		return table.Text(), nil
 	}
 

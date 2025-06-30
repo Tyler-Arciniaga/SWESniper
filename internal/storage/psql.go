@@ -172,3 +172,25 @@ func (pg *Postgres) ChangeLog_GetAll() ([]models.ChangeRecord, error) {
 	}
 	return logs, nil
 }
+
+func (pg *Postgres) ChangeLog_GetOneUrl(urlID int) ([]models.ChangeRecord, error) {
+	query := `SELECT * FROM changelogs WHERE url_id = $1`
+	rows, err := pg.Pool.Query(context.Background(), query, urlID)
+
+	if err != nil {
+		return nil, fmt.Errorf("error fetching change log records for specified url id: %d", urlID)
+	}
+
+	defer rows.Close()
+
+	var records []models.ChangeRecord
+	for rows.Next() {
+		var r models.ChangeRecord
+		if err := rows.Scan(&r.ID, &r.URL_id, &r.URL, &r.Timestamp, &r.DiffSummary); err != nil {
+			return []models.ChangeRecord{}, fmt.Errorf("error scanning row: %v", err)
+		}
+		records = append(records, r)
+	}
+
+	return records, nil
+}

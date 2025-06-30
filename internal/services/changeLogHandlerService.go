@@ -1,6 +1,11 @@
 package services
 
-import "github.com/Tyler-Arciniaga/SWESniper/internal/models"
+import (
+	"fmt"
+	"strconv"
+
+	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
+)
 
 type ChangeLogService struct {
 	ChangeRepository ChangeLogStore
@@ -9,6 +14,7 @@ type ChangeLogService struct {
 type ChangeLogStore interface {
 	LogURLChange(l models.ChangeRecord) error
 	ChangeLog_GetAll() ([]models.ChangeRecord, error)
+	ChangeLog_GetOneUrl(urlID int) ([]models.ChangeRecord, error)
 }
 
 func (s *ChangeLogService) PersistChangeRecord(r *models.ChangeRecord) error {
@@ -26,4 +32,18 @@ func (s *ChangeLogService) GetAllChangeRecords() ([]models.ChangeRecord, error) 
 	}
 
 	return data, nil
+}
+
+func (s *ChangeLogService) GetOneUrlChangeRecord(urlID string) ([]models.ChangeRecord, error) {
+	int_id, err := strconv.Atoi(urlID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid url id parameter")
+	}
+
+	ChangeRecords, e := s.ChangeRepository.ChangeLog_GetOneUrl(int_id)
+	if e != nil {
+		return nil, fmt.Errorf("error getting change record from postgres DB: %v", e)
+	}
+
+	return ChangeRecords, nil
 }

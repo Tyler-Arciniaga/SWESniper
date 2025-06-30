@@ -51,5 +51,6 @@ func main() {
 	router.GET("/urls/:id", urlHandler.HandleGetURLById)
 	router.DELETE("/urls/:id", urlHandler.HandleDeleteURL)
 	router.GET("/changelog", changeLogHandler.HandleGetAllChanges)
+	router.GET("/changelog/:id", changeLogHandler.HandleGetURlChanges)
 	router.Run()
 }

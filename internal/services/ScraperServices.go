@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
@@ -34,9 +35,21 @@ func (s *ScraperService) ExtractURLContent(url string) (string, error) {
 	if github_readme.Length() < 1 {
 		return "", fmt.Errorf("no github readme file detected")
 	}
-	table := github_readme.Find("table")
 
-	if table.Length() > 1 {
+	accessiblity_table := github_readme.Find("markdown-accessiblity-table")
+
+	if accessiblity_table.Length() == 0 {
+		log.Print("checking for a-table under strong tag...")
+		accessiblity_table = github_readme.Find("strong markdown-accessiblity-table")
+	}
+
+	table := accessiblity_table.Find("table")
+
+	if table.Length() == 0 {
+		log.Printf("no table detected under: %v", accessiblity_table)
+	}
+
+	if table.Length() >= 1 {
 		return table.Text(), nil
 	}
 

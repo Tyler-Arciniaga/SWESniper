@@ -95,7 +95,7 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 		}
 
 		if newHashedBody != r.LastKnownHash {
-			//log.Printf("Detected change in URL %q\n", r.URL)
+			log.Printf("Detected change in URL %q\n", r.URL)
 			diffRes := p.DiffCheckService.DiffCheckContents(strings.Join(r.LastKnownContent, ""), scrappedContent)
 			newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), DiffSummary: diffRes.Summary}
 			p.ChangeLogService.PersistChangeRecord(&newChangeLog)

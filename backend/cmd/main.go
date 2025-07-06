@@ -4,17 +4,46 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/handlers"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/notifier"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/poller"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/services"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/storage"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
+
+// CORS middleware
+func enableCORS(w http.ResponseWriter, r *http.Request) {
+	// Allow requests from your React dev server
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+
+	// Allow specific HTTP methods
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
+	// Allow specific headers
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+	// Handle preflight requests
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+}
+
+// Wrapper function for your handlers
+func corsHandler(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		enableCORS(w, r)
+		next(w, r)
+	}
+}
 
 func main() {
 	//load env variables
@@ -58,6 +87,17 @@ func main() {
 
 	//create and start server with all proper handlers
 	router := gin.Default()
+
+	//configure CORS middleware
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
 	router.POST("/urls", urlHandler.HandleAddURL)
 	router.GET("/urls", urlHandler.HandleGetURLs)
 	router.GET("/urls/:id", urlHandler.HandleGetURLById)

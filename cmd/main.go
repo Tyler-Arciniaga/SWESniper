@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/handlers"
@@ -12,9 +13,17 @@ import (
 	"github.com/Tyler-Arciniaga/SWESniper/internal/storage"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	//load env variables
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Printf("%v", err)
+		log.Fatal("Error loading .env file")
+	}
+
 	//create connection pool to postgres
 	connstr := "postgresql://localhost/swesniper" //hardcoded databaseURL change later!!!
 	dbpool, err := pgxpool.New(context.Background(), connstr)

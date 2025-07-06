@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -20,31 +19,6 @@ import (
 )
 
 // CORS middleware
-func enableCORS(w http.ResponseWriter, r *http.Request) {
-	// Allow requests from your React dev server
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-
-	// Allow specific HTTP methods
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-
-	// Allow specific headers
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-	// Handle preflight requests
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-}
-
-// Wrapper function for your handlers
-func corsHandler(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		enableCORS(w, r)
-		next(w, r)
-	}
-}
-
 func main() {
 	//load env variables
 	err := godotenv.Load("../../.env")

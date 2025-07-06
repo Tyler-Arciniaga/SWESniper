@@ -42,8 +42,8 @@ const URLCard = ({ url, onViewChanges, onDelete }) => {
     width: "10px",
     height: "10px",
     borderRadius: "50%",
-    backgroundColor: getStatusColor(url.lastChecked),
-    boxShadow: `0 0 0 3px ${getStatusColor(url.lastChecked)}20`,
+    backgroundColor: getStatusColor(url.lastCheckAt),
+    boxShadow: `0 0 0 3px ${getStatusColor(url.lastCheckAt)}20`,
   };
 
   const titleStyle = {
@@ -117,12 +117,12 @@ const URLCard = ({ url, onViewChanges, onDelete }) => {
 
       <div style={infoStyle}>
         <span style={{ marginRight: "8px" }}>⏰</span>
-        <span>Last checked: {formatDate(url.lastChecked)}</span>
+        <span>Last checked: {formatDate(url.lastCheckAt)}</span>
       </div>
 
       <div style={infoStyle}>
         <span style={{ marginRight: "8px" }}>🔄</span>
-        <span>Every {url.checkInterval} minutes</span>
+        <span>Every {url.checkInterval} seconds</span>
       </div>
 
       <div style={buttonContainerStyle}>
@@ -445,11 +445,11 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
                   <span style={{ marginRight: "8px" }}>⚡</span>
                   <strong>Changes:</strong>
                   <span style={{ marginLeft: "8px" }}>
-                    {change.summary || "Content modified"}
+                    {change.diffSummary || "Content modified"}
                   </span>
                 </p>
 
-                {change.details && (
+                {change.added && (
                   <div style={{ marginTop: "12px" }}>
                     <p
                       style={{
@@ -473,7 +473,7 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
                         lineHeight: "1.4",
                       }}
                     >
-                      {change.details}
+                      {change.added}
                     </pre>
                   </div>
                 )}
@@ -531,14 +531,13 @@ const App = () => {
   const [changes, setChanges] = useState([]);
   const [error, setError] = useState("");
 
-  // Replace with your actual backend URL
+  // TODO: Replace with actual backend URL in PROD
   const API_BASE_URL = "http://localhost:8080";
 
   // Fetch all tracked URLs
   const fetchURLs = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/urls`);
-      console.log("Here");
       if (!response.ok) throw new Error("Failed to fetch URLs");
       const data = await response.json();
       setUrls(data);
@@ -593,7 +592,7 @@ const App = () => {
   // View changes for a URL
   const viewChanges = async (url) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/urls/${url.id}/changes`);
+      const response = await fetch(`${API_BASE_URL}/changelog/${url.id}`);
       if (!response.ok) throw new Error("Failed to fetch changes");
       const data = await response.json();
       setChanges(data);

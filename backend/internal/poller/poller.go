@@ -73,8 +73,7 @@ func (p *Poller) StartPoller() {
   - Store the new hash
 */
 func (p *Poller) CheckURL(r *models.URLRecord) {
-	//DONT FORGET TO CHANGE TO time.duration(r.CheckInterval).seconds()
-	if time.Since(r.LastCheckedAt) >= time.Duration(r.CheckInterval) {
+	if time.Since(r.LastCheckedAt) >= time.Duration(r.CheckInterval)*time.Second {
 		scrappedContent_RawString, scrappedContent_Formatted, e := p.ScraperService.ExtractURLContent(r.URL)
 
 		if scrappedContent_RawString == "" && scrappedContent_Formatted == nil {
@@ -85,9 +84,6 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 			log.Printf("Failed to extract main content from url %q, recieved err %q\n", r.URL, e)
 			return
 		}
-
-		//DELETE ME! (used to generate testData from real URLs)
-		//os.WriteFile("../testdata/repo2.txt", []byte(scrappedContent), 0644)
 
 		newHash, e := p.FetchHash(string(scrappedContent_RawString))
 

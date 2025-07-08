@@ -239,7 +239,7 @@ const AddURLForm = ({ onAddURL, isLoading }) => {
 
       <input
         type="number"
-        placeholder="⏱️ Check interval in minutes"
+        placeholder="⏱️ Check interval in seconds"
         value={formData.checkInterval}
         onChange={(e) =>
           setFormData({ ...formData, checkInterval: parseInt(e.target.value) })

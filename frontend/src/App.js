@@ -336,7 +336,7 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
     paddingRight: "50px",
   };
 
-  if (!changes) {
+  if (url.lastKnownHash === "INVALID_COULD_NOT_EXTRACT_WEB_CONTENT") {
     return (
       <div style={modalOverlayStyle} onClick={onClose}>
         <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
@@ -403,7 +403,7 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
           </p>
         </div>
 
-        {changes.length === 0 ? (
+        {!changes || changes.length === 0 ? (
           <div
             style={{
               textAlign: "center",

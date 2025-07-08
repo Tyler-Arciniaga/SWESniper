@@ -34,7 +34,7 @@ func (s *ScraperService) ExtractURLContent(url string) (string, []models.JobList
 	github_readme := doc.Find("article.markdown-body")
 
 	if github_readme.Length() < 1 {
-		return "", nil, fmt.Errorf("no github readme file detected")
+		return "", nil, fmt.Errorf("no github readme detected")
 	}
 
 	accessiblity_table := github_readme.Find("markdown-accessiblity-table")

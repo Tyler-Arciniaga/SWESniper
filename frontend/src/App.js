@@ -336,6 +336,37 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
     paddingRight: "50px",
   };
 
+  if (!changes) {
+    return (
+      <div style={modalOverlayStyle} onClick={onClose}>
+        <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
+          <button style={closeButtonStyle} onClick={onClose}>
+            ×
+          </button>
+          <h2 style={headerStyle}>📈 Change Log: {url.description}</h2>
+
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px 20px",
+              color: "#6c757d",
+            }}
+          >
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}>😔</div>
+            <p style={{ fontSize: "18px", margin: "0" }}>
+              Something went wrong with the checking of this url.
+            </p>
+            <p style={{ fontSize: "14px", margin: "8px 0 0 0" }}>
+              I would love to hear your feedback, feel free to email me
+              @tyarciniaga@gmail.com with a screenshot and url for me to fix
+              this bug ASAP :)
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={modalOverlayStyle} onClick={onClose}>
       <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
@@ -713,7 +744,7 @@ const App = () => {
         <div style={headerStyle}>
           <h1 style={mainTitleStyle}>🎯 SWE Sniper</h1>
           <p style={subtitleStyle}>
-            Track job board URLs and get notified when they change
+            Track github repo job board URLs and get notified when they change
           </p>
         </div>
 

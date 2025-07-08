@@ -400,92 +400,95 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
             >
               📊 Recent Changes ({changes.length}):
             </h3>
-            {changes.map((change, index) => (
-              <div key={index} style={changeStyle}>
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "16px",
-                    right: "16px",
-                    backgroundColor: "#667eea",
-                    color: "white",
-                    padding: "4px 8px",
-                    borderRadius: "12px",
-                    fontSize: "12px",
-                    fontWeight: "500",
-                  }}
-                >
-                  #{changes.length - index}
-                </div>
-
-                <p
-                  style={{
-                    margin: "0 0 12px 0",
-                    fontSize: "14px",
-                    color: "#6c757d",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <span style={{ marginRight: "8px" }}>🕐</span>
-                  <strong>Detected:</strong>
-                  <span style={{ marginLeft: "8px" }}>
-                    {new Date(change.timestamp).toLocaleString()}
-                  </span>
-                </p>
-
-                <p
-                  style={{
-                    margin: "0 0 12px 0",
-                    fontSize: "15px",
-                    color: "#2c3e50",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <span style={{ marginRight: "8px" }}>⚡</span>
-                  <strong>Changes:</strong>
-                  <span style={{ marginLeft: "8px" }}>
-                    {change.diffSummary || "Content modified"}
-                  </span>
-                </p>
-
-                {change.added && (
-                  <div style={{ marginTop: "12px" }}>
-                    <p
-                      style={{
-                        margin: "0 0 8px 0",
-                        fontSize: "13px",
-                        color: "#6c757d",
-                        fontWeight: "500",
-                      }}
-                    >
-                      📝 Details:
-                    </p>
-                    <div
-                      style={{
-                        backgroundColor: "#2c3e50",
-                        color: "#ffffff",
-                        padding: "12px",
-                        borderRadius: "6px",
-                        fontSize: "12px",
-                        overflow: "auto",
-                        fontFamily: "Consolas, Monaco, monospace",
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      {change.added.map((job, i) => (
-                        <div key={i} style={{ marginBottom: "12px" }}>
-                          {job.fields?.map((field, j) => (
-                            <div key={j}>{field}</div>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
+            {changes
+              .slice()
+              .reverse()
+              .map((change, index) => (
+                <div key={index} style={changeStyle}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "16px",
+                      right: "16px",
+                      backgroundColor: "#667eea",
+                      color: "white",
+                      padding: "4px 8px",
+                      borderRadius: "12px",
+                      fontSize: "12px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    #{changes.length - index}
                   </div>
-                )}
-              </div>
-            ))}
+
+                  <p
+                    style={{
+                      margin: "0 0 12px 0",
+                      fontSize: "14px",
+                      color: "#6c757d",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ marginRight: "8px" }}>🕐</span>
+                    <strong>Detected:</strong>
+                    <span style={{ marginLeft: "8px" }}>
+                      {new Date(change.timestamp).toLocaleString()}
+                    </span>
+                  </p>
+
+                  <p
+                    style={{
+                      margin: "0 0 12px 0",
+                      fontSize: "15px",
+                      color: "#2c3e50",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ marginRight: "8px" }}>⚡</span>
+                    <strong>Changes:</strong>
+                    <span style={{ marginLeft: "8px" }}>
+                      {change.diffSummary || "Content modified"}
+                    </span>
+                  </p>
+
+                  {change.added && (
+                    <div style={{ marginTop: "12px" }}>
+                      <p
+                        style={{
+                          margin: "0 0 8px 0",
+                          fontSize: "13px",
+                          color: "#6c757d",
+                          fontWeight: "500",
+                        }}
+                      >
+                        📝 Details:
+                      </p>
+                      <div
+                        style={{
+                          backgroundColor: "#2c3e50",
+                          color: "#ffffff",
+                          padding: "12px",
+                          borderRadius: "6px",
+                          fontSize: "12px",
+                          overflow: "auto",
+                          fontFamily: "Consolas, Monaco, monospace",
+                          lineHeight: "1.4",
+                        }}
+                      >
+                        {change.added.map((job, i) => (
+                          <div key={i} style={{ marginBottom: "12px" }}>
+                            {job.fields?.map((field, j) => (
+                              <div key={j}>{field}</div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
         )}
 
@@ -522,7 +525,6 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
             >
               {url.lastKnownContent.map((job, index) => (
                 <div key={index} style={{ marginBottom: "12px" }}>
-                  {console.log(job)}
                   {job.fields?.map((field, i) => (
                     <div key={i}>{field}</div>
                   ))}

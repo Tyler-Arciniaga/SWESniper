@@ -267,6 +267,7 @@ const AddURLForm = ({ onAddURL, isLoading }) => {
   );
 };
 
+//TODO: fix here!!!
 // ChangeLogModal Component
 const ChangeLogModal = ({ url, changes, onClose }) => {
   if (!url) return null;
@@ -461,7 +462,7 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
                     >
                       📝 Details:
                     </p>
-                    <pre
+                    <div
                       style={{
                         backgroundColor: "#2c3e50",
                         color: "#ffffff",
@@ -473,8 +474,14 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
                         lineHeight: "1.4",
                       }}
                     >
-                      {change.added}
-                    </pre>
+                      {change.added.map((job, i) => (
+                        <div key={i} style={{ marginBottom: "12px" }}>
+                          {job.fields?.map((field, j) => (
+                            <div key={j}>{field}</div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -500,7 +507,7 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
             >
               📄 Last Known Content:
             </h3>
-            <pre
+            <div
               style={{
                 backgroundColor: "#2c3e50",
                 color: "#ffffff",
@@ -513,8 +520,15 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
                 lineHeight: "1.4",
               }}
             >
-              {url.lastKnownContent}
-            </pre>
+              {url.lastKnownContent.map((job, index) => (
+                <div key={index} style={{ marginBottom: "12px" }}>
+                  {console.log(job)}
+                  {job.fields?.map((field, i) => (
+                    <div key={i}>{field}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -641,7 +655,6 @@ const App = () => {
     margin: "0 0 16px 0",
     background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
     WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
     textShadow: "0 2px 4px rgba(0,0,0,0.1)",
   };
 

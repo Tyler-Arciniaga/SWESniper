@@ -29,6 +29,7 @@ func main() {
 
 	//create connection pool to postgres
 	connstr := "postgresql://localhost/swesniper" //hardcoded databaseURL change later!!!
+	//connstr := os.Getenv("SUPABASE_API_KEY")
 	dbpool, err := pgxpool.New(context.Background(), connstr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)

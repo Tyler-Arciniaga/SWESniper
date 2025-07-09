@@ -81,7 +81,6 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 		}
 
 		if e != nil {
-			log.Printf("Failed to extract main content from url %q, recieved err %q\n", r.URL, e)
 			r.LastKnownHash = "INVALID_COULD_NOT_EXTRACT_WEB_CONTENT"
 			e = p.UrlService.UpdateURL(r)
 			if e != nil {

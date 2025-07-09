@@ -480,7 +480,7 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
                     <span style={{ marginRight: "8px" }}>⚡</span>
                     <strong>Changes:</strong>
                     <span style={{ marginLeft: "8px" }}>
-                      {change.diffSummary || "Content modified"}
+                      {change.diffsummary || "Content modified"}
                     </span>
                   </p>
 
@@ -744,7 +744,8 @@ const App = () => {
         <div style={headerStyle}>
           <h1 style={mainTitleStyle}>🎯 SWE Sniper</h1>
           <p style={subtitleStyle}>
-            Track github repo job board URLs and get notified when they change
+            Precision job tracking and change detection for early-bird SWE
+            internship hunters.
           </p>
         </div>
 

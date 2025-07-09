@@ -35,10 +35,11 @@ func (pg *Supabase) SaveURL(r models.URLRecord) error {
 	}
 
 	//insert new url record into url table
-	query := `INSERT INTO urls (url, description, check_interval, last_checked_at, last_known_hash, last_known_content, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	query := `INSERT INTO urls (url, user_id, description, check_interval, last_checked_at, last_known_hash, last_known_content, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	_, err = pg.Pool.Exec(context.Background(), query,
 		r.URL,
+		r.User_id,
 		r.Description,
 		r.CheckInterval,
 		time.Now(), // last_checked_at

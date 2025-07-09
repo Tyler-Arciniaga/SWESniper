@@ -1,7 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
 	"github.com/Tyler-Arciniaga/SWESniper/internal/services"
@@ -16,23 +20,53 @@ func (h *URLHandler) HandleAddURL(c *gin.Context) {
 	var req models.AddURLRequest
 	err := c.ShouldBindJSON(&req)
 
+	//validate request body
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid request body"})
 		return
 	}
 
+	//validate user authorization
+	user, e := h.ExtractUserInfo(c)
+	if e != nil {
+		c.JSON(http.StatusUnauthorized, e)
+	}
+
+	//validate check interval
 	if e := h.Service.ValidateURLPost(&req); e != nil {
 		c.JSON(http.StatusBadRequest, e.Error())
 		return
 	}
 
-	err = h.Service.StoreURL(&req)
+	err = h.Service.StoreURL(&req, &user)
 	if err != nil {
 		c.JSON(http.StatusConflict, err.Error())
 		return
 	}
 
 	c.Status(http.StatusCreated)
+}
+
+func (h *URLHandler) ExtractUserInfo(c *gin.Context) (models.User, error) {
+	authHeader := c.Request.Header.Get("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	endpoint := fmt.Sprintf("https://%s.supabase.co/auth/v1/user", os.Getenv("SUPABASE_PROJECT_REF"))
+	r, _ := http.NewRequest(http.MethodGet, endpoint, nil)
+	r.Header.Set("Authorization", "Bearer "+token)
+	r.Header.Set("apikey", os.Getenv("SUPABASE_ANON_KEY"))
+
+	client := &http.Client{}
+	resp, err := client.Do(r)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return models.User{}, err
+	}
+
+	var user models.User
+	json.NewDecoder(resp.Body).Decode(&user)
+
+	return user, nil
+
 }
 
 func (h *URLHandler) HandleGetURLs(c *gin.Context) {

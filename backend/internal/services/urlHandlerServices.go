@@ -29,10 +29,11 @@ func (s *URLService) ValidateURLPost(r *models.AddURLRequest) error {
 	return nil
 }
 
-func (s *URLService) StoreURL(r *models.AddURLRequest) error {
+func (s *URLService) StoreURL(r *models.AddURLRequest, u *models.User) error {
 	c := time.Now()
 	urlRecord := models.URLRecord{
 		URL:           r.URL,
+		User_id:       u.Id,
 		Description:   r.Description,
 		CheckInterval: r.CheckInterval,
 		LastCheckedAt: c,

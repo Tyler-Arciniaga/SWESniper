@@ -89,13 +89,19 @@ func (h *URLHandler) HandleGetURLs(c *gin.Context) {
 }
 
 func (h *URLHandler) HandleGetURLById(c *gin.Context) {
+	//extract user from request
+	user, err := h.ExtractUserInfo(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, err)
+	}
+
 	urlID := c.Param("id")
 	if urlID == "" {
 		c.JSON(http.StatusBadRequest, "no urlID extracted from URL param")
 		return
 	}
 
-	URLData, e := h.Service.GetURLById(urlID)
+	URLData, e := h.Service.GetURLById(user, urlID)
 
 	if e != nil {
 		c.JSON(http.StatusConflict, e.Error())

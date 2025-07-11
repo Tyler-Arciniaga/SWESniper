@@ -105,20 +105,20 @@ func (pg *Supabase) URL_GetAll(u models.User) ([]models.URLRecord, error) {
 	return records, nil
 }
 
-func (pg *Supabase) URL_GetOne(urlID int) (models.URLRecord, error) {
-	query1 := `SELECT EXISTS (SELECT 1 FROM urls WHERE id = $1)`
-	query2 := `SELECT * from urls WHERE id = $1`
+func (pg *Supabase) URL_GetOne(u models.User, urlID int) (models.URLRecord, error) {
+	query1 := `SELECT EXISTS (SELECT 1 FROM urls WHERE id = $1 AND user_id = $2)`
+	query2 := `SELECT * from urls WHERE id = $1 AND user_id = $2`
 
 	var exists bool
-	err := pg.Pool.QueryRow(context.Background(), query1, urlID).Scan(&exists)
+	err := pg.Pool.QueryRow(context.Background(), query1, urlID, u.Id).Scan(&exists)
 
 	if err != nil || !exists {
 		return models.URLRecord{}, fmt.Errorf("error checking for existence of queried url or url does not exist in database: %v", err)
 	}
 
 	var r models.URLRecord
-	row := pg.Pool.QueryRow(context.Background(), query2, urlID)
-	err = row.Scan(&r.ID, &r.URL, &r.Description, &r.CheckInterval, &r.LastCheckedAt, &r.LastKnownHash, &r.LastKnownContent, &r.Created_at)
+	row := pg.Pool.QueryRow(context.Background(), query2, urlID, u.Id)
+	err = row.Scan(&r.ID, &r.User_id, &r.URL, &r.Description, &r.CheckInterval, &r.LastCheckedAt, &r.LastKnownHash, &r.LastKnownContent, &r.Created_at)
 
 	if err != nil {
 		return models.URLRecord{}, fmt.Errorf("error scanning row: %v", err)

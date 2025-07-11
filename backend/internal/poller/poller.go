@@ -37,7 +37,8 @@ Start()
 
 func (p *Poller) StartPoller() {
 	fmt.Print("Starting poller...\n")
-	ticker := time.NewTicker(10 * time.Second)
+	//DEV: change back to 10 * time.Second after testing non poller funcitonality
+	ticker := time.NewTicker(1000 * time.Second)
 
 	for range ticker.C {
 

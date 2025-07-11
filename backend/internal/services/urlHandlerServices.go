@@ -17,7 +17,7 @@ type URLStore interface {
 	UpdateURLInfo(r models.URLRecord) error
 	URL_GetAllGlobal() ([]models.URLRecord, error)
 	URL_GetAll(u models.User) ([]models.URLRecord, error)
-	URL_GetOne(urlID int) (models.URLRecord, error)
+	URL_GetOne(u models.User, urlID int) (models.URLRecord, error)
 	URL_Delete(urlID int) error
 }
 
@@ -69,13 +69,13 @@ func (s *URLService) GetAllURLsGlobally() ([]models.URLRecord, error) {
 	return data, nil
 }
 
-func (s *URLService) GetURLById(urlID string) (models.URLRecord, error) {
+func (s *URLService) GetURLById(u models.User, urlID string) (models.URLRecord, error) {
 	int_id, err := strconv.Atoi(urlID)
 	if err != nil {
 		return models.URLRecord{}, fmt.Errorf("invalid url id parameter")
 	}
 
-	data, e := s.URLStore.URL_GetOne(int_id)
+	data, e := s.URLStore.URL_GetOne(u, int_id)
 
 	if e != nil {
 		return models.URLRecord{}, fmt.Errorf("error getting url by id in postgres: %v", e)

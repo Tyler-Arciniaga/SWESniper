@@ -18,7 +18,7 @@ type URLStore interface {
 	URL_GetAllGlobal() ([]models.URLRecord, error)
 	URL_GetAll(u models.User) ([]models.URLRecord, error)
 	URL_GetOne(u models.User, urlID int) (models.URLRecord, error)
-	URL_Delete(urlID int) error
+	URL_Delete(u models.User, urlID int) error
 }
 
 // validates add URL POST request
@@ -92,13 +92,13 @@ func (s *URLService) UpdateURL(r *models.URLRecord) error {
 	return nil
 }
 
-func (s *URLService) DeleteURL(urlID string) error {
+func (s *URLService) DeleteURL(u models.User, urlID string) error {
 	int_id, err := strconv.Atoi(urlID)
 
 	if err != nil {
 		return fmt.Errorf("invalid url id parameter")
 	}
-	e := s.URLStore.URL_Delete(int_id)
+	e := s.URLStore.URL_Delete(u, int_id)
 
 	if e != nil {
 		return e

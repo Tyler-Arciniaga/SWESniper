@@ -128,9 +128,9 @@ func (pg *Supabase) URL_GetOne(u models.User, urlID int) (models.URLRecord, erro
 
 }
 
-func (pg *Supabase) URL_Delete(urlID int) error {
-	query := `DELETE FROM urls WHERE id = $1`
-	res, err := pg.Pool.Exec(context.Background(), query, urlID)
+func (pg *Supabase) URL_Delete(u models.User, urlID int) error {
+	query := `DELETE FROM urls WHERE id = $1 and user_id = $2`
+	res, err := pg.Pool.Exec(context.Background(), query, urlID, u.Id)
 
 	if err != nil {
 		return fmt.Errorf("error deleting url from urls table: %v", err)

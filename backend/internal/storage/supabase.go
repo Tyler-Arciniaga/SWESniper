@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
@@ -27,6 +28,7 @@ func (pg *Supabase) SaveURL(r models.URLRecord) error {
 	var exists bool
 	err := pg.Pool.QueryRow(context.Background(), "SELECT EXISTS (SELECT 1 FROM urls WHERE url = $1)", r.URL).Scan(&exists)
 	if err != nil {
+		log.Printf("error: %v", err)
 		return errors.New("error checking for url existence in database")
 	}
 

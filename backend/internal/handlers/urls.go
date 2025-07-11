@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -31,6 +32,8 @@ func (h *URLHandler) HandleAddURL(c *gin.Context) {
 	if e != nil {
 		c.JSON(http.StatusUnauthorized, e)
 	}
+
+	log.Printf(" user: %v", user)
 
 	//validate check interval
 	if e := h.Service.ValidateURLPost(&req); e != nil {

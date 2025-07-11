@@ -14,6 +14,7 @@ import (
 	"github.com/Tyler-Arciniaga/SWESniper/internal/storage"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
@@ -27,10 +28,27 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	//create connection pool to postgres
 	//connstr := "postgresql://localhost/swesniper" //hardcoded databaseURL change later!!!
+
+	//extract connection string from environment variables
 	connstr := os.Getenv("SUPABASE_API_KEY")
-	dbpool, err := pgxpool.New(context.Background(), connstr)
+	if connstr == "" {
+		fmt.Fprint(os.Stderr, "no connection string set")
+		os.Exit(1)
+	}
+
+	//create a new config
+	config, err := pgxpool.ParseConfig(connstr)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to parse connection string: %v\n", err)
+		os.Exit(1)
+	}
+
+	//disable prepared statements to support Supabase transaction pooler
+	config.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
+
+	//create connection pool
+	dbpool, err := pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
 		os.Exit(1)
@@ -45,7 +63,7 @@ func main() {
 		}
 	*/
 
-	db := &storage.Postgres{Pool: dbpool}
+	db := &storage.Supabase{Pool: dbpool}
 	urlService := services.URLService{URLStore: db}
 	urlHandler := handlers.URLHandler{Service: urlService}
 

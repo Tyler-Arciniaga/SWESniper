@@ -24,11 +24,24 @@ type Supabase struct {
 }
 
 func (pg *Supabase) SaveURL(r models.URLRecord) error {
+	//check to see if url already exists in db for this specific user
+	var exists bool
+	err := pg.Pool.QueryRow(context.Background(), "SELECT EXISTS (SELECT 1 FROM urls WHERE url = $1 AND user_id = $2)", r.URL, r.User_id).Scan(&exists)
+	if err != nil {
+		return errors.New("error checking for url existence in database")
+	}
+
+	if exists {
+		return errors.New("url already exists in database, perhaps try updating it instead")
+	}
+
+	//convert job listing struct to marshalled jsonb
 	jsonBytes, err := json.Marshal([]models.JobListing{})
 	if err != nil {
 		return fmt.Errorf("failed to marshal JobListing struct: %w", err)
 	}
 
+	//insert into supabase DB
 	query := `INSERT INTO urls (url, user_id, description, check_interval, last_checked_at, last_known_hash, last_known_content, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	_, err = pg.Pool.Exec(context.Background(), query,
@@ -50,13 +63,19 @@ func (pg *Supabase) SaveURL(r models.URLRecord) error {
 }
 
 func (pg *Supabase) UpdateURLInfo(r models.URLRecord) error {
-	query := `UPDATE urls SET last_checked_at = $1, last_known_hash =  $2, last_known_content = $3 WHERE url = $4`
+	jsonBytes, err := json.Marshal(r.LastKnownContent)
+	if err != nil {
+		return fmt.Errorf("failed to marshal JobListing struct: %w", err)
+	}
 
-	_, err := pg.Pool.Exec(context.Background(), query,
+	query := `UPDATE urls SET last_checked_at = $1, last_known_hash =  $2, last_known_content = $3 WHERE url = $4 AND user_id = $5`
+
+	_, err = pg.Pool.Exec(context.Background(), query,
 		r.LastCheckedAt,
 		r.LastKnownHash,
-		r.LastKnownContent,
+		string(jsonBytes),
 		r.URL,
+		r.User_id,
 	)
 
 	if err != nil {

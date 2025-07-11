@@ -38,7 +38,7 @@ Start()
 func (p *Poller) StartPoller() {
 	fmt.Print("Starting poller...\n")
 	//DEV: change back to 10 * time.Second after testing non poller funcitonality
-	ticker := time.NewTicker(1000 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 
 	for range ticker.C {
 
@@ -99,16 +99,18 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 
 		if newHash != r.LastKnownHash {
 			log.Printf("Detected change in URL %q\n", r.URL)
-			diffRes := p.DiffCheckService.DiffCheckContentsFormatted(r.LastKnownContent, scrappedContent_Formatted)
-			newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), Added: diffRes.Added, DiffSummary: diffRes.Summary}
+			/*
+				diffRes := p.DiffCheckService.DiffCheckContentsFormatted(r.LastKnownContent, scrappedContent_Formatted)
+				newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), Added: diffRes.Added, DiffSummary: diffRes.Summary}
 
-			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
+				p.ChangeLogService.PersistChangeRecord(&newChangeLog)
 
-			tmp := r.Description
-			e = p.Notifier.SendNotification(newChangeLog, tmp)
-			if e != nil {
-				log.Printf("error sending notification for: %q\n", r.URL)
-			}
+				tmp := r.Description
+				e = p.Notifier.SendNotification(newChangeLog, tmp)
+				if e != nil {
+					log.Printf("error sending notification for: %q\n", r.URL)
+				}
+			*/
 
 			if scrappedContent_Formatted != nil {
 				r.LastKnownContent = scrappedContent_Formatted

@@ -43,7 +43,7 @@ func (p *Poller) StartPoller() {
 
 		var wg sync.WaitGroup
 
-		url_list, _ := p.UrlService.GetAllURLs()
+		url_list, _ := p.UrlService.GetAllURLsGlobally()
 
 		for _, value := range url_list {
 			wg.Add(1)

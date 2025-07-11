@@ -15,7 +15,8 @@ type URLService struct {
 type URLStore interface {
 	SaveURL(r models.URLRecord) error
 	UpdateURLInfo(r models.URLRecord) error
-	URL_GetAll() ([]models.URLRecord, error)
+	URL_GetAllGlobal() ([]models.URLRecord, error)
+	URL_GetAll(u models.User) ([]models.URLRecord, error)
 	URL_GetOne(urlID int) (models.URLRecord, error)
 	URL_Delete(urlID int) error
 }
@@ -48,8 +49,18 @@ func (s *URLService) StoreURL(r *models.AddURLRequest, u *models.User) error {
 	return nil
 }
 
-func (s *URLService) GetAllURLs() ([]models.URLRecord, error) {
-	data, e := s.URLStore.URL_GetAll()
+func (s *URLService) GetAllURLs(u models.User) ([]models.URLRecord, error) {
+	data, e := s.URLStore.URL_GetAll(u)
+
+	if e != nil {
+		return nil, e
+	}
+
+	return data, nil
+}
+
+func (s *URLService) GetAllURLsGlobally() ([]models.URLRecord, error) {
+	data, e := s.URLStore.URL_GetAllGlobal()
 
 	if e != nil {
 		return nil, e

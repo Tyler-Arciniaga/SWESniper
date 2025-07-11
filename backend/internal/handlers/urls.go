@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -33,7 +32,7 @@ func (h *URLHandler) HandleAddURL(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, e)
 	}
 
-	log.Printf(" user: %v", user)
+	//log.Printf(" user: %v", user)
 
 	//validate check interval
 	if e := h.Service.ValidateURLPost(&req); e != nil {
@@ -73,7 +72,13 @@ func (h *URLHandler) ExtractUserInfo(c *gin.Context) (models.User, error) {
 }
 
 func (h *URLHandler) HandleGetURLs(c *gin.Context) {
-	URLData, e := h.Service.GetAllURLs()
+	//extract user from request
+	user, err := h.ExtractUserInfo(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, err)
+	}
+
+	URLData, e := h.Service.GetAllURLs(user)
 
 	if e != nil {
 		c.JSON(http.StatusNotFound, e.Error())

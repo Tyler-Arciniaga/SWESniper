@@ -163,21 +163,18 @@ func (pg *Supabase) URL_Delete(u models.User, urlID int) error {
 }
 
 func (pg *Supabase) LogURLChange(l models.ChangeRecord) error {
-	//find id of desired url
-	var urlID int
-	query := `SELECT id from urls WHERE url = $1`
-	err := pg.Pool.QueryRow(context.Background(), query, l.URL).Scan(&urlID)
+	jsonBytes, err := json.Marshal(l.Added)
 	if err != nil {
-		return fmt.Errorf("error querying for url id in url table: %v", err)
+		return fmt.Errorf("failed to marshal JobListing struct: %w", err)
 	}
 
 	//create new log record in change logs table
-	query = `INSERT INTO changelogs (url_id, url, timestamp, added, diff_summary) VALUES ($1, $2, $3, $4, $5)`
+	query := `INSERT INTO changelogs (url_id, url, timestamp, added, diff_summary) VALUES ($1, $2, $3, $4, $5)`
 	_, err = pg.Pool.Exec(context.Background(), query,
-		urlID,
+		l.URL_id,
 		l.URL,
 		time.Now(),
-		l.Added,
+		string(jsonBytes),
 		l.DiffSummary,
 	)
 
@@ -188,9 +185,9 @@ func (pg *Supabase) LogURLChange(l models.ChangeRecord) error {
 	return nil
 }
 
-func (pg *Supabase) ChangeLog_GetAll() ([]models.ChangeRecord, error) {
-	query := `SELECT * FROM changelogs`
-	rows, err := pg.Pool.Query(context.Background(), query)
+func (pg *Supabase) ChangeLog_GetAll(u models.User) ([]models.ChangeRecord, error) {
+	query := `SELECT c.* FROM changelogs c JOIN urls u ON c.url_id = u.id WHERE u.user_id = $1`
+	rows, err := pg.Pool.Query(context.Background(), query, u.Id)
 
 	if err != nil {
 		return []models.ChangeRecord{}, errors.New("error fetching all records from change logs table")
@@ -209,9 +206,9 @@ func (pg *Supabase) ChangeLog_GetAll() ([]models.ChangeRecord, error) {
 	return logs, nil
 }
 
-func (pg *Supabase) ChangeLog_GetOneUrl(urlID int) ([]models.ChangeRecord, error) {
-	query := `SELECT * FROM changelogs WHERE url_id = $1`
-	rows, err := pg.Pool.Query(context.Background(), query, urlID)
+func (pg *Supabase) ChangeLog_GetOneUrl(u models.User, urlID int) ([]models.ChangeRecord, error) {
+	query := `SELECT c.* FROM changelogs c JOIN urls u on c.url_id = $1 WHERE u.user_id = $2`
+	rows, err := pg.Pool.Query(context.Background(), query, urlID, u.Id)
 
 	if err != nil {
 		return nil, fmt.Errorf("error fetching change log records for specified url id: %d", urlID)

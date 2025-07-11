@@ -99,12 +99,10 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 
 		if newHash != r.LastKnownHash {
 			log.Printf("Detected change in URL %q\n", r.URL)
+			diffRes := p.DiffCheckService.DiffCheckContentsFormatted(r.LastKnownContent, scrappedContent_Formatted)
+			newChangeLog := models.ChangeRecord{URL_id: r.ID, URL: r.URL, Timestamp: time.Now(), Added: diffRes.Added, DiffSummary: diffRes.Summary}
+			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
 			/*
-				diffRes := p.DiffCheckService.DiffCheckContentsFormatted(r.LastKnownContent, scrappedContent_Formatted)
-				newChangeLog := models.ChangeRecord{URL: r.URL, Timestamp: time.Now(), Added: diffRes.Added, DiffSummary: diffRes.Summary}
-
-				p.ChangeLogService.PersistChangeRecord(&newChangeLog)
-
 				tmp := r.Description
 				e = p.Notifier.SendNotification(newChangeLog, tmp)
 				if e != nil {

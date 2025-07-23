@@ -68,7 +68,6 @@ func (h *URLHandler) ExtractUserInfo(c *gin.Context) (models.User, error) {
 	json.NewDecoder(resp.Body).Decode(&user)
 
 	return user, nil
-
 }
 
 func (h *URLHandler) HandleGetURLs(c *gin.Context) {

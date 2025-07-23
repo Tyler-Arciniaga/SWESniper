@@ -12,9 +12,9 @@ import (
 type EmailNotifier struct{}
 
 // TODO: eventually buy domain of swesniper.com to make email more legitamate and less likely to be sent to spam
-func (e *EmailNotifier) SendNotification(r models.ChangeRecord, desc string) error {
+func (e *EmailNotifier) SendNotification(r models.ChangeRecord, desc, userEmail string) error {
 	from := mail.NewEmail("SWE Sniper", "tyarciniaga@gmail.com")
-	to := mail.NewEmail("Ty", "tylerarc@umich.edu")
+	to := mail.NewEmail("", userEmail)
 	plainTextContent := e.FormatNotification(r, desc)
 	//htmlContent := e.FormatNotification(r, desc)
 	subject := fmt.Sprintf("Job Board Updated: %q", desc)

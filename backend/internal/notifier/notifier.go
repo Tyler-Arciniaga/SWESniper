@@ -8,7 +8,7 @@ import (
 )
 
 type Notifier interface {
-	SendNotification(r models.ChangeRecord, desc string) error
+	SendNotification(r models.ChangeRecord, desc string, userEmail string) error
 	FormatNotification(r models.ChangeRecord, desc string) string
 }
 

@@ -2,8 +2,11 @@ package poller
 
 import (
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -102,13 +105,17 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 			diffRes := p.DiffCheckService.DiffCheckContentsFormatted(r.LastKnownContent, scrappedContent_Formatted)
 			newChangeLog := models.ChangeRecord{URL_id: r.ID, URL: r.URL, Timestamp: time.Now(), Added: diffRes.Added, DiffSummary: diffRes.Summary}
 			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
-			/*
-				tmp := r.Description
-				e = p.Notifier.SendNotification(newChangeLog, tmp)
+
+			desc := r.Description
+			userEmail, err := p.ExtractUserEmail(r.User_id)
+			if err != nil {
+				log.Printf("could not extract user email for %v, aborting notification", r.User_id)
+			} else {
+				e = p.Notifier.SendNotification(newChangeLog, desc, userEmail)
 				if e != nil {
 					log.Printf("error sending notification for: %q\n", r.URL)
 				}
-			*/
+			}
 
 			if scrappedContent_Formatted != nil {
 				r.LastKnownContent = scrappedContent_Formatted
@@ -125,6 +132,38 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 			log.Fatalf("Error: %v", e)
 		}
 	}
+}
+
+func (p *Poller) ExtractUserEmail(userID string) (string, error) {
+	endpoint := fmt.Sprintf("https://%s.supabase.co/auth/v1/admin/users/%s", os.Getenv("SUPABASE_PROJECT_REF"), userID)
+
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("SUPABASE_SERVICE_ROLE_KEY"))
+	req.Header.Set("apikey", os.Getenv("SUPABASE_SERVICE_ROLE_KEY"))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("error fetching user info: %v", err)
+	}
+
+	defer resp.Body.Close()
+
+	var email struct {
+		Email string `json:"email"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&email); err != nil {
+		return "", fmt.Errorf("failed to decode user info: %v", err)
+	}
+
+	return email.Email, nil
+
 }
 
 func (p *Poller) FetchHash(body string) (string, error) {

@@ -13,6 +13,7 @@ const LoginPage = ({ onLogin }) => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({});
   const [error, setError] = useState("");
 
   // Handle form input changes
@@ -41,7 +42,44 @@ const LoginPage = ({ onLogin }) => {
     try {
       // TODO: Replace with actual API call in production
       // For now, we'll simulate a login with demo credentials
-      if (
+      //make API call to Supabase auth service
+      //NOTE: had to make a seperate env file within root of frontend directory, need to make sure this does not interfere with
+      //the extract of env variables in backend go logic
+      fetch(
+        `https://${process.env.REACT_APP_SUPABASE_PROJECT_REF}.supabase.co/auth/v1/token?grant_type=password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Connection: "keep-alive",
+            apikey: process.env.REACT_APP_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(
+              `HTTP error trying to retrieve access token from supabase: ${response.status}`
+            );
+          }
+          console.log(response.body);
+          return response.json();
+        })
+        .then((data) => {
+          const accessToken = data.access_token;
+          const user = {
+            email: formData.email,
+          };
+
+          onLogin(user, accessToken);
+        });
+
+      /*
+        if (
         formData.email === "demo@example.com" &&
         formData.password === "password"
       ) {
@@ -65,6 +103,7 @@ const LoginPage = ({ onLogin }) => {
 
         onLogin(userData, token);
       }
+        */
     } catch (err) {
       setError("Login failed. Please try again.");
     } finally {

@@ -267,7 +267,6 @@ const AddURLForm = ({ onAddURL, isLoading }) => {
   );
 };
 
-//TODO: fix here!!!
 // ChangeLogModal Component
 const ChangeLogModal = ({ url, changes, onClose }) => {
   if (!url) return null;
@@ -570,7 +569,7 @@ const ChangeLogModal = ({ url, changes, onClose }) => {
 };
 
 // Main App Component
-const App = () => {
+const Dashboard = ({ onLogout }) => {
   const [urls, setUrls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addingURL, setAddingURL] = useState(false);
@@ -580,11 +579,22 @@ const App = () => {
 
   // TODO: Replace with actual backend URL in PROD
   const API_BASE_URL = "http://localhost:8080";
+  const accessToken = localStorage.getItem("authToken");
+  if (accessToken == null) {
+    onLogout();
+  }
+  const user = localStorage.getItem("userData");
 
   // Fetch all tracked URLs
   const fetchURLs = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/urls`);
+      const response = await fetch(`${API_BASE_URL}/urls`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch URLs");
       const data = await response.json();
       setUrls(data);
@@ -649,6 +659,13 @@ const App = () => {
     }
   };
 
+  // Handle logout
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      onLogout();
+    }
+  };
+
   // Load URLs on component mount
   useEffect(() => {
     fetchURLs();
@@ -680,6 +697,26 @@ const App = () => {
     borderRadius: "20px",
     padding: "32px",
     boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+    position: "relative",
+  };
+
+  const logoutButtonStyle = {
+    position: "absolute",
+    top: "20px",
+    right: "20px",
+    background: "rgba(255, 255, 255, 0.2)",
+    border: "2px solid rgba(255, 255, 255, 0.3)",
+    borderRadius: "12px",
+    color: "white",
+    padding: "10px 20px",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    backdropFilter: "blur(10px)",
+    transition: "all 0.3s ease",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
   };
 
   const mainTitleStyle = {
@@ -742,6 +779,23 @@ const App = () => {
     <div style={containerStyle}>
       <div style={contentStyle}>
         <div style={headerStyle}>
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            style={logoutButtonStyle}
+            onMouseEnter={(e) => {
+              e.target.style.background = "rgba(255, 255, 255, 0.3)";
+              e.target.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = "rgba(255, 255, 255, 0.2)";
+              e.target.style.transform = "translateY(0)";
+            }}
+          >
+            <span>🚪</span>
+            Logout
+          </button>
+
           <h1 style={mainTitleStyle}>🎯 SWE Sniper</h1>
           <p style={subtitleStyle}>
             Precision job tracking and change detection for early-bird SWE
@@ -817,4 +871,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Dashboard;

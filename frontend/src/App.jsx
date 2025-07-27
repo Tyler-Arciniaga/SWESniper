@@ -20,6 +20,7 @@ const App = () => {
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Check if user is already logged in on app load
@@ -39,6 +40,7 @@ const App = () => {
     localStorage.setItem("authToken", token);
     localStorage.setItem("userData", JSON.stringify(userData));
     setIsAuthenticated(true);
+    setAccessToken(token);
     setUser(userData);
   };
 
@@ -80,6 +82,9 @@ const App = () => {
     );
   }
 
+  console.log(isAuthenticated);
+  console.log(localStorage.getItem("authToken"));
+  console.log(localStorage.getItem("userData"));
   return (
     <Router>
       <Routes>

@@ -246,8 +246,8 @@ const LandingPage = () => {
               margin: "0",
             }}
           >
-            Built by a CS student for CS student. Trust me I know the struggle
-            ...
+            We all know the struggle of trying to apply early. SWE Sniper is
+            built by a CS student for CS student
           </p>
 
           <div style={featuresGridStyle}>

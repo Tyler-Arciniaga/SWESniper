@@ -45,7 +45,7 @@ const LoginPage = ({ onLogin }) => {
       //make API call to Supabase auth service
       //NOTE: had to make a seperate env file within root of frontend directory, need to make sure this does not interfere with
       //the extract of env variables in backend go logic
-      fetch(
+      const response = fetch(
         `https://${process.env.REACT_APP_SUPABASE_PROJECT_REF}.supabase.co/auth/v1/token?grant_type=password`,
         {
           method: "POST",
@@ -59,24 +59,22 @@ const LoginPage = ({ onLogin }) => {
             password: formData.password,
           }),
         }
-      )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(
-              `HTTP error trying to retrieve access token from supabase: ${response.status}`
-            );
-          }
-          console.log(response.body);
-          return response.json();
-        })
-        .then((data) => {
-          const accessToken = data.access_token;
-          const user = {
-            email: formData.email,
-          };
+      );
 
-          onLogin(user, accessToken);
-        });
+      if (!response.ok) {
+        throw new Error(
+          `HTTP error trying to retrieve access token from supabase: ${response.status}`
+        );
+      }
+
+      const data = await response.JSON;
+      const accessToken = data.access_token;
+
+      const user = {
+        email: formData.email,
+      };
+
+      onLogin(user, accessToken);
 
       /*
         if (
@@ -106,6 +104,7 @@ const LoginPage = ({ onLogin }) => {
         */
     } catch (err) {
       setError("Login failed. Please try again.");
+      console.log("login failed");
     } finally {
       setLoading(false);
     }

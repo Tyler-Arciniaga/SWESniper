@@ -1,0 +1,1 @@
+1. migrate auth api interactions to the backend not the front end for eventual production

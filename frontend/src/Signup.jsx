@@ -51,9 +51,23 @@ const Signup = ({ onSignup }) => {
     }
 
     try {
-      // TODO: Replace with actual API call in production
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      //TODO: migrate this logic to the backend (make frontend hit a api endpoint from the backend and the backend interacts with supabase)
+      //DO NOT EXPOSE SERVICE ROLE KEY TO FRONT END (has admin privs)
+      fetch(
+        `https://${process.env.REACT_APP_SUPABASE_PROJECT_REF}.supabase.co/auth/v1/admin/users`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY}`,
+            apikey: `${process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: {
+            email: formData.email,
+            password: formData.password,
+          },
+        }
+      );
 
       // Mock user creation - in production, make actual API call
       const userData = {

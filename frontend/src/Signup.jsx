@@ -12,6 +12,9 @@ const Signup = ({ onSignup }) => {
   const [error, setError] = useState("");
   const [isHovered, setIsHovered] = useState(false);
 
+  //TODO: change in final PROD!!!
+  const API_BASE_URL = "http://localhost:8080";
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,34 +54,32 @@ const Signup = ({ onSignup }) => {
     }
 
     try {
-      //TODO: migrate this logic to the backend (make frontend hit a api endpoint from the backend and the backend interacts with supabase)
-      //DO NOT EXPOSE SERVICE ROLE KEY TO FRONT END (has admin privs)
-      fetch(
-        `https://${process.env.REACT_APP_SUPABASE_PROJECT_REF}.supabase.co/auth/v1/admin/users`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY}`,
-            apikey: `${process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: {
-            email: formData.email,
-            password: formData.password,
-          },
-        }
-      );
+      // Call backend signup API
+      const response = await fetch(`${API_BASE_URL}/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          email_confirm: true,
+        }),
+      });
 
-      // Mock user creation - in production, make actual API call
-      const userData = {
-        id: Date.now(),
-        name: formData.name,
-        email: formData.email,
-      };
+      if (!response.ok) {
+        const errData = await response.json();
+        console.log(errData);
+        throw new Error(errData?.message || "Failed to sign up user");
+      }
 
-      onSignup(userData);
+      const userData = await response.json();
+      onSignup(userData); // Only call after successful signup
     } catch (err) {
-      setError("Failed to create account. Please try again.");
+      setError(
+        "Failed to sign up user: " +
+          "perhaps account already exists with given email"
+      );
     } finally {
       setIsLoading(false);
     }

@@ -70,6 +70,9 @@ func main() {
 	changeLogService := services.ChangeLogService{ChangeRepository: db}
 	changeLogHandler := handlers.ChangeLogHandler{Service: changeLogService}
 
+	authService := services.AuthService{}
+	authHandler := handlers.AuthHandler{Service: authService}
+
 	scraperService := services.ScraperService{}
 
 	notifier := &notifier.EmailNotifier{}
@@ -97,5 +100,6 @@ func main() {
 	router.DELETE("/urls/:id", urlHandler.HandleDeleteURL)
 	router.GET("/changelog", changeLogHandler.HandleGetAllChanges)
 	router.GET("/changelog/:id", changeLogHandler.HandleGetURlChanges)
+	router.POST("/signup", authHandler.HandleSignUp)
 	router.Run()
 }

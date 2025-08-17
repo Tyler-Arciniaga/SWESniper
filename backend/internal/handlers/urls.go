@@ -32,8 +32,6 @@ func (h *URLHandler) HandleAddURL(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, e)
 	}
 
-	//log.Printf(" user: %v", user)
-
 	//validate check interval
 	if e := h.Service.ValidateURLPost(&req); e != nil {
 		c.JSON(http.StatusBadRequest, e.Error())

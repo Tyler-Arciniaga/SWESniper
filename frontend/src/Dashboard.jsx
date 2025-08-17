@@ -597,7 +597,7 @@ const Dashboard = ({ onLogout }) => {
       });
       if (!response.ok) throw new Error("Failed to fetch URLs");
       const data = await response.json();
-      setUrls(data);
+      setUrls(data || []);
     } catch (err) {
       setError("Failed to load URLs: " + err.message);
     } finally {
@@ -613,6 +613,7 @@ const Dashboard = ({ onLogout }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(urlData),
       });

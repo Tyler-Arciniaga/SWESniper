@@ -13,7 +13,7 @@ const LoginPage = ({ onLogin }) => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({});
+  //const [data, setData] = useState({});
   const [error, setError] = useState("");
 
   // Handle form input changes
@@ -40,12 +40,9 @@ const LoginPage = ({ onLogin }) => {
     setError("");
 
     try {
-      // TODO: Replace with actual API call in production
-      // For now, we'll simulate a login with demo credentials
-      //make API call to Supabase auth service
       //NOTE: had to make a seperate env file within root of frontend directory, need to make sure this does not interfere with
       //the extract of env variables in backend go logic
-      const response = fetch(
+      const response = await fetch(
         `https://${process.env.REACT_APP_SUPABASE_PROJECT_REF}.supabase.co/auth/v1/token?grant_type=password`,
         {
           method: "POST",
@@ -67,7 +64,8 @@ const LoginPage = ({ onLogin }) => {
         );
       }
 
-      const data = await response.JSON;
+      const data = await response.json();
+      console.log(data);
       const accessToken = data.access_token;
 
       const user = {
@@ -104,7 +102,7 @@ const LoginPage = ({ onLogin }) => {
         */
     } catch (err) {
       setError("Login failed. Please try again.");
-      console.log("login failed");
+      console.log("login failed", err);
     } finally {
       setLoading(false);
     }

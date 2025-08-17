@@ -650,7 +650,13 @@ const Dashboard = ({ onLogout }) => {
   // View changes for a URL
   const viewChanges = async (url) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/changelog/${url.id}`);
+      const response = await fetch(`${API_BASE_URL}/changelog/${url.id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch changes");
       const data = await response.json();
       setChanges(data);

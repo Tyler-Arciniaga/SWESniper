@@ -101,6 +101,6 @@ func main() {
 	router.GET("/changelog", changeLogHandler.HandleGetAllChanges)
 	router.GET("/changelog/:id", changeLogHandler.HandleGetURlChanges)
 	router.POST("/signup", authHandler.HandleSignUp)
-	router.GET("/health", healthHandler.HandleHealthCheck)
+	router.Any("/health", healthHandler.HandleHealthCheck)
 	router.Run()
 }

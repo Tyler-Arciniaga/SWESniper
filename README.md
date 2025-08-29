@@ -2,11 +2,16 @@
 
 > Precision job tracking and change detection for early-bird SWE internship hunters.
 
-SWE Sniper is a fully functional, production-grade backend monitoring tool paired with a lightweight frontend interface. It automatically tracks curated job boards and GitHub repositories for **Summer 2026 SWE internship opportunities**, notifies users about updates, and logs historical changes with visual clarity — empowering aspiring engineers to **apply first and stay ahead**.
+SWE Sniper is a **full-stack, production-ready web application** that continuously monitors curated job boards and GitHub repositories for **Summer 2026 SWE internship postings**.
+
+When new opportunities appear or existing ones change, SWE Sniper instantly detects, logs, and surfaces the updates through a clean, intuitive interface. By combining a **high-performance Go backend** with a **modern React frontend**, it helps aspiring engineers **apply first, stay organized, and gain an edge in competitive recruiting cycles.**
 
 ---
 
-## 🚀 Demo
+## 🚀 Live Demo
+
+🔗 **[Try SWE Sniper here](https://swe-sniper.vercel.app/)**  
+_(deployed via Vercel + Render)_
 
 ![SWE Sniper Demo](./Demo1.gif) <!-- Replace with your actual GIF or video link -->
 
@@ -18,7 +23,7 @@ SWE Sniper is a fully functional, production-grade backend monitoring tool paire
 - ⚡ **Change Detection & Summarization** – Captures added/removed content with precise diffs and human-readable summaries.
 - 🔔 **Real-time Notifications** – Alerts sent via email (SendGrid) or optional webhooks for immediate visibility.
 - 🧠 **Auto-Adaptable Parsing** – Handles both full GitHub repo views and raw `.md` file URLs intelligently.
-- 🧱 **Modular, Scalable Architecture** – Designed for future multi-user support, user dashboards, and cloud deployment.
+- 🌐 Deployed & Always-On – Backend on Render, frontend on Vercel, monitored via UptimeRobot with health-check endpoints.
 
 ---
 
@@ -32,7 +37,10 @@ SWE Sniper is a fully functional, production-grade backend monitoring tool paire
 | **Database**     | SQLite (for MVP), pluggable to Postgres |
 | **Scraper**      | Custom web scraper made in Go           |
 | **Diff Engine**  | Custom text diff algorithm              |
-| **Deployment**   | Docker (future), Localhost for testing  |
+| **Deployment**   | Deployment                              |
+
+Render (backend), Vercel (frontend), UptimeRobot monitoring
+|
 
 ---
 
@@ -42,19 +50,20 @@ SWE Sniper is a fully functional, production-grade backend monitoring tool paire
 [Job Board URL] ─▶ [Poller] ─▶ [Parser] ─▶ [Diff Engine] ─▶ [Notifier]
                                       │
                                       ▼
-                                [SQLite DB]
+                                [Supabase / Postgres DB]
+                                      │
+                                      ▼
+                                 [React frontend UI]
 
 •	Poller checks each tracked URL on a schedule.
 •	Parser scrapes and extracts structured content.
 •	Diff Engine compares current vs. previous snapshots.
 •	Notifier alerts users of meaningful changes.
-•	Database keeps a log of all URLs and their change history.
+•	Database keeps a log of all URLs and their change history as well
+•	Frontend provides a clean UI to visualize changes as user specific data
 ```
 
 ## 💡 Future Enhancements
 
-    •	👥 Multi-user authentication & dashboards
-    •	☁️ Cloud deployment via Fly.io or Render
-    •	📈 Analytics dashboard for tracked URLs
     •	🔐 OAuth-based login (GitHub, Google)
     •	📦 Webhook plug-ins (Slack, Discord, SMS)

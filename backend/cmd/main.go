@@ -84,7 +84,7 @@ func main() {
 
 	//configure CORS middleware
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://swesniper.onrender.com"}, //PROD API
+		AllowOrigins:     []string{"https://swe-sniper.vercel.app"}, //PROD API
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

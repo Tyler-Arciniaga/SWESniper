@@ -636,6 +636,10 @@ const Dashboard = ({ onLogout }) => {
     try {
       const response = await fetch(`${API_BASE_URL}/urls/${id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
       if (!response.ok) throw new Error("Failed to delete URL");

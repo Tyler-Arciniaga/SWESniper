@@ -82,7 +82,7 @@ const App = () => {
     );
   }
 
-  console.log(isAuthenticated);
+  console.log("authenticated: ", isAuthenticated);
   console.log(localStorage.getItem("authToken"));
   console.log(localStorage.getItem("userData"));
   return (

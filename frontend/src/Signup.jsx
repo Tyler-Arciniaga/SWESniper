@@ -13,7 +13,7 @@ const Signup = ({ onSignup }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   //TODO: change in final PROD!!!
-  const API_BASE_URL = "http://localhost:8080";
+  const API_BASE_URL = "https://swesniper.onrender.com";
 
   // Handle form submission
   const handleSubmit = async (e) => {

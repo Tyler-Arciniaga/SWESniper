@@ -22,10 +22,8 @@ import (
 // CORS middleware
 func main() {
 	//load env variables
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		log.Printf("%v", err)
-		log.Fatal("Error loading .env file")
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, relying on environment variables")
 	}
 
 	//connstr := "postgresql://localhost/swesniper" //hardcoded databaseURL change later!!!
@@ -86,7 +84,7 @@ func main() {
 
 	//configure CORS middleware
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{"https://swesniper.onrender.com"}, //PROD API
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

@@ -578,7 +578,7 @@ const Dashboard = ({ onLogout }) => {
   const [error, setError] = useState("");
 
   // TODO: Replace with actual backend URL in PROD
-  const API_BASE_URL = "http://localhost:8080";
+  const API_BASE_URL = "https://swesniper.onrender.com";
   const accessToken = localStorage.getItem("authToken");
   if (accessToken == null) {
     onLogout();

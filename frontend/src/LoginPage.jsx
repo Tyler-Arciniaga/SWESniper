@@ -65,7 +65,7 @@ const LoginPage = ({ onLogin }) => {
       }
 
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       const accessToken = data.access_token;
 
       const user = {
@@ -102,7 +102,7 @@ const LoginPage = ({ onLogin }) => {
         */
     } catch (err) {
       setError("Login failed. Please try again.");
-      console.log("login failed", err);
+      //console.log("login failed", err);
     } finally {
       setLoading(false);
     }

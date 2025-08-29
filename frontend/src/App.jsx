@@ -82,9 +82,9 @@ const App = () => {
     );
   }
 
-  console.log("authenticated: ", isAuthenticated);
-  console.log(localStorage.getItem("authToken"));
-  console.log(localStorage.getItem("userData"));
+  //console.log("authenticated: ", isAuthenticated);
+  //console.log(localStorage.getItem("authToken"));
+  //console.log(localStorage.getItem("userData"));
   return (
     <Router>
       <Routes>

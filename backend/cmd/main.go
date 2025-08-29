@@ -71,6 +71,8 @@ func main() {
 	authService := services.AuthService{}
 	authHandler := handlers.AuthHandler{Service: authService}
 
+	healthHandler := handlers.HealthHandler{}
+
 	scraperService := services.ScraperService{}
 
 	notifier := &notifier.EmailNotifier{}
@@ -99,5 +101,6 @@ func main() {
 	router.GET("/changelog", changeLogHandler.HandleGetAllChanges)
 	router.GET("/changelog/:id", changeLogHandler.HandleGetURlChanges)
 	router.POST("/signup", authHandler.HandleSignUp)
+	router.GET("/health", healthHandler.HandleHealthCheck)
 	router.Run()
 }

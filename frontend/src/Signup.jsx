@@ -69,7 +69,7 @@ const Signup = ({ onSignup }) => {
 
       if (!response.ok) {
         const errData = await response.json();
-        console.log(errData);
+        //console.log(errData);
         throw new Error(errData?.message || "Failed to sign up user");
       }
 

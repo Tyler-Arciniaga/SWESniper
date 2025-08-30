@@ -2,6 +2,7 @@ package notifier
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/Tyler-Arciniaga/SWESniper/internal/models"
@@ -13,6 +14,11 @@ type EmailNotifier struct{}
 
 // TODO: eventually buy domain of swesniper.com to make email more legitamate and less likely to be sent to spam
 func (e *EmailNotifier) SendNotification(r models.ChangeRecord, desc, userEmail string) error {
+	if len(r.Added) == 0 {
+		log.Printf("No meaningful changes to notify for %q", r.URL)
+		return nil
+	}
+
 	from := mail.NewEmail("SWE Sniper", "tyarciniaga@gmail.com")
 	to := mail.NewEmail("", userEmail)
 	plainTextContent := e.FormatNotification(r, desc)

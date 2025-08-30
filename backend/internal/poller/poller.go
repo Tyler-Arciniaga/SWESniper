@@ -102,12 +102,36 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 
 		if newHash != r.LastKnownHash {
 			log.Printf("Detected change in URL %q\n", r.URL)
+
+			//update record before persisting new data so future goroutines don't see stale data
+			if scrappedContent_Formatted != nil {
+				r.LastKnownContent = scrappedContent_Formatted
+			} else {
+				r.LastKnownContent = nil
+			}
+
+			r.LastCheckedAt = time.Now()
+			r.LastKnownHash = newHash
+
+			if err := p.UrlService.UpdateURL(r); err != nil {
+				log.Fatalf("Error updating URL record: %v", err)
+			}
+
+			// Now safe to diff + log change
 			diffRes := p.DiffCheckService.DiffCheckContentsFormatted(r.LastKnownContent, scrappedContent_Formatted)
+
+			if len(diffRes.Added) == 0 && len(diffRes.Summary) == 0 {
+				log.Printf("Change detected at %q but no diff found (skipping notification)", r.URL)
+				return
+			}
+
 			newChangeLog := models.ChangeRecord{URL_id: r.ID, URL: r.URL, Timestamp: time.Now(), Added: diffRes.Added, DiffSummary: diffRes.Summary}
 			p.ChangeLogService.PersistChangeRecord(&newChangeLog)
 
 			desc := r.Description
+
 			userEmail, err := p.ExtractUserEmail(r.User_id)
+
 			if err != nil {
 				log.Printf("could not extract user email for %v, aborting notification", r.User_id)
 			} else {
@@ -117,19 +141,6 @@ func (p *Poller) CheckURL(r *models.URLRecord) {
 				}
 			}
 
-			if scrappedContent_Formatted != nil {
-				r.LastKnownContent = scrappedContent_Formatted
-			} else {
-				r.LastKnownContent = nil
-			}
-
-		}
-		r.LastCheckedAt = time.Now()
-		r.LastKnownHash = newHash
-
-		e = p.UrlService.UpdateURL(r)
-		if e != nil {
-			log.Fatalf("Error: %v", e)
 		}
 	}
 }

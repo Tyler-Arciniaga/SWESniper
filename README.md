@@ -13,7 +13,7 @@ When new opportunities appear or existing ones change, SWE Sniper instantly dete
 🔗 **[Try SWE Sniper here](https://swe-sniper.vercel.app/)**  
 _(deployed via Vercel + Render)_
 
-![SWE Sniper Demo](./Demo1.gif) <!-- Replace with your actual GIF or video link -->
+![SWE Sniper Demo](./Demo2.gif) <!-- Replace with your actual GIF or video link -->
 
 ---
 
